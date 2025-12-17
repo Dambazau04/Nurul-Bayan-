@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nurul Bayan Science Academy - Portal</title>
+    <title>Nurul Bayan Science Academy - Management System</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,411 +11,540 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
+    
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
         :root {
-            --primary: #047857; /* Deep Green */
-            --secondary: #D4AF37; /* Gold */
-            --dark: #1F2937;
-            --light: #F3F4F6;
+            --primary: #047857; /* Emerald 700 */
+            --secondary: #D97706; /* Amber 600 */
+            --dark: #064E3B;
+            --light: #F0FDF4;
         }
-
+        
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: #f0f2f5;
+            background-color: #f3f4f6;
             overflow-x: hidden;
         }
-
+        
         .arabic-text {
             font-family: 'Amiri', serif;
         }
 
-        /* Animations */
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        .slide-up { animation: slideUp 0.5s ease-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Glassmorphism */
-        .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10B981; 
+            border-radius: 4px;
+        }
 
-        /* PRINT STYLES - CRITICAL */
+        /* Unique Stamp Design */
+        .unique-stamp {
+            width: 140px;
+            height: 140px;
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: var(--primary);
+            text-align: center;
+            transform: rotate(-15deg);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 0 4px white, 0 0 0 6px var(--primary);
+            margin: 0 auto;
+        }
+        .unique-stamp-inner {
+            width: 90%;
+            height: 90%;
+            border: 1px dashed var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 11px;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+        .unique-stamp-inner span.approved {
+            color: var(--secondary);
+            font-size: 16px;
+            margin: 4px 0;
+            border-top: 2px solid var(--secondary);
+            border-bottom: 2px solid var(--secondary);
+            padding: 2px 10px;
+        }
+
+        /* Timetable Styling */
+        .tt-header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .tt-cell {
+            transition: all 0.2s;
+            position: relative;
+        }
+        .tt-cell:hover {
+            background-color: #ecfdf5;
+        }
+        .tt-input:focus {
+            background-color: #fff;
+            box-shadow: inset 0 0 0 2px var(--secondary);
+        }
+
+        /* Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Modal Transitions */
+        .modal {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* PRINT STYLES - REVISED FOR BULK */
         @media print {
-            @page { size: auto; margin: 0mm; }
-            body * { visibility: hidden; }
-            
-            /* Print Area Visibility */
-            #print-area, #print-area * {
-                visibility: visible;
+            @page {
+                size: A4 portrait;
+                margin: 0; 
             }
-            
-            #print-area {
+
+            /* Hide EVERYTHING in the main app */
+            #app-container, #login-screen, #toast-container, .modal, .no-print {
+                display: none !important;
+            }
+
+            /* Show ONLY the global print container */
+            #global-print-container {
+                display: block !important;
                 position: absolute;
-                left: 0;
                 top: 0;
+                left: 0;
                 width: 100%;
                 margin: 0;
                 padding: 0;
                 background: white;
             }
 
-            /* Report Card Specifics */
-            .report-card-page {
-                width: 210mm;
-                height: 297mm;
-                padding: 10mm;
+            /* Report Card Page Wrapper */
+            .report-page-wrapper {
                 page-break-after: always;
+                page-break-inside: avoid;
+                width: 210mm;
+                min-height: 297mm;
+                padding: 5mm;
+                box-sizing: border-box;
                 position: relative;
-                border: none !important;
-                box-shadow: none !important;
+                overflow: hidden;
+            }
+            .report-page-wrapper:last-child {
+                page-break-after: auto;
             }
 
-            /* Receipt Specifics */
-            .receipt-page {
-                width: 100%;
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 20px;
-            }
-
-            /* Timetable Specifics (Landscape) */
-            .timetable-page {
-                width: 297mm;
-                height: 210mm;
-                transform: rotate(0deg); /* Browser usually handles orientation via @page */
-            }
-
-            @page {
-                size: A4 portrait; /* Default */
-            }
-
-            /* Background Colors Logic */
-            .bg-green-700 { background-color: #047857 !important; -webkit-print-color-adjust: exact; }
-            .text-white { color: white !important; -webkit-print-color-adjust: exact; }
-            .bg-gray-100 { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+            /* Force background colors */
+            .bg-emerald-800 { background-color: #065F46 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-emerald-100 { background-color: #D1FAE5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-emerald-50 { background-color: #ECFDF5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .text-emerald-800 { color: #065F46 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .text-white { color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             
-            .no-print-break { break-inside: avoid; }
-        }
-
-        /* Old Stamp class kept for legacy reference, but replaced by SVG in JS */
-        .school-stamp-container {
-            display: inline-block;
-            position: relative;
+            /* Table borders for print */
+            table, th, td {
+                border: 1px solid #000 !important;
+                border-collapse: collapse;
+            }
+            
+            /* QR Code visibility fix */
+            .qr-code-img {
+                display: block !important;
+            }
         }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-green-800 to-green-600">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-96 text-center slide-up">
-            <div class="mb-6">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-graduation-cap text-3xl text-green-700"></i>
+    <!-- Notifications -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 z-50 bg-emerald-900 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:scale-105 duration-300 mx-4">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-800 text-3xl">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-green-800">Admin Login</h2>
-                <p class="text-gray-500 text-sm">Nurul Bayan Science Academy</p>
+                <h1 class="text-2xl font-bold text-emerald-800">Nurul Bayan Academy</h1>
+                <p class="text-sm text-gray-500 mt-1">Admin Portal</p>
             </div>
-            <form id="login-form" onsubmit="handleLogin(event)">
-                <div class="mb-4">
-                    <input type="text" id="username" placeholder="Username" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition" required>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" id="username" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" placeholder="Enter username">
                 </div>
-                <div class="mb-6">
-                    <input type="password" id="password" placeholder="Password" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition" required>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500" placeholder="••••••••">
                 </div>
-                <button type="submit" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded-lg transition transform hover:scale-105 shadow-lg">
-                    Login securely
+                <button type="submit" class="w-full bg-emerald-700 text-white py-2 rounded-lg font-semibold hover:bg-emerald-800 transition duration-200 shadow-md">
+                    Secure Login
                 </button>
             </form>
-            <p id="login-error" class="text-red-500 text-sm mt-4 hidden">Invalid credentials.</p>
         </div>
     </div>
 
-    <!-- MAIN APP -->
-    <div id="app-container" class="hidden min-h-screen flex">
+    <!-- Dashboard Layout -->
+    <div id="app-container" class="hidden flex h-screen overflow-hidden">
         
-        <!-- SIDEBAR -->
-        <aside class="w-64 bg-green-900 text-white flex-shrink-0 hidden md:flex flex-col transition-all duration-300" id="sidebar">
-            <div class="p-6 text-center border-b border-green-800">
-                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3 text-green-800 font-bold text-2xl">NB</div>
-                <h1 class="font-bold text-lg leading-tight">NURUL BAYAN</h1>
-                <p class="text-xs text-green-300 opacity-75">Science Academy</p>
+        <!-- Sidebar -->
+        <aside id="sidebar" class="bg-emerald-900 text-white w-64 flex-shrink-0 hidden md:flex flex-col transition-all duration-300">
+            <div class="p-6 border-b border-emerald-800 flex flex-col items-center">
+                <i class="fas fa-school text-4xl text-amber-400 mb-2"></i>
+                <h2 class="font-bold text-center leading-tight">NURUL BAYAN<br><span class="text-xs text-emerald-300 font-normal">Science Academy</span></h2>
             </div>
-            
             <nav class="flex-1 overflow-y-auto py-4">
                 <ul class="space-y-1">
-                    <li><button onclick="navigate('dashboard')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-home w-5"></i> Dashboard</button></li>
-                    <li><button onclick="navigate('students')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-user-graduate w-5"></i> Students</button></li>
-                    <li><button onclick="navigate('subjects')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-book w-5"></i> Subjects</button></li>
-                    <li><button onclick="navigate('scores')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-edit w-5"></i> Manage Scores</button></li>
-                    <li><button onclick="navigate('report-cards')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-file-invoice w-5"></i> Report Cards</button></li>
-                    <li><button onclick="navigate('finance')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-money-bill-wave w-5"></i> Receipts</button></li>
-                    <li><button onclick="navigate('timetable')" class="nav-btn w-full text-left px-6 py-3 hover:bg-green-800 flex items-center gap-3 transition"><i class="fas fa-calendar-alt w-5"></i> Timetable</button></li>
+                    <li><button onclick="nav('dashboard')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent active-nav"><i class="fas fa-chart-pie w-5"></i> Dashboard</button></li>
+                    <li><button onclick="nav('students')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-user-graduate w-5"></i> Students</button></li>
+                    <li><button onclick="nav('subjects')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-book w-5"></i> Subjects</button></li>
+                    <li><button onclick="nav('marks')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-edit w-5"></i> Manage Marks</button></li>
+                    <li><button onclick="nav('reports')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-print w-5"></i> Report Cards</button></li>
+                    <li><button onclick="nav('finance')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-receipt w-5"></i> Receipts</button></li>
+                    <li><button onclick="nav('timetable')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-calendar-alt w-5"></i> Timetable</button></li>
                 </ul>
             </nav>
-
-            <div class="p-4 border-t border-green-800">
-                <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded text-sm text-white transition">Logout</button>
+            <div class="p-4 border-t border-emerald-800">
+                <button onclick="logout()" class="w-full bg-red-600 hover:bg-red-700 py-2 rounded text-sm font-medium transition">Logout</button>
             </div>
         </aside>
 
-        <!-- MAIN CONTENT -->
-        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
             <!-- Header -->
-            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10">
-                <button class="md:hidden text-green-800 text-2xl" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-                <div class="font-bold text-gray-700">Session: <span class="text-green-600">2025/2026</span></div>
-                <div class="flex items-center gap-3">
-                    <span class="text-sm font-medium text-gray-600">Admin</span>
-                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700"><i class="fas fa-user"></i></div>
+            <header class="bg-white shadow-sm z-20 flex items-center justify-between px-6 py-3 no-print">
+                <button id="menu-toggle" class="md:hidden text-emerald-800 text-2xl"><i class="fas fa-bars"></i></button>
+                <div class="font-semibold text-gray-700">
+                    Session: <span id="current-session-display" class="text-emerald-700">2025/2026</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-gray-800">Administrator</p>
+                        <p class="text-xs text-gray-500">Nurul Bayan Academy</p>
+                    </div>
+                    <div class="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700">
+                        <i class="fas fa-user"></i>
+                    </div>
                 </div>
             </header>
 
-            <!-- Content Area -->
-            <div id="content-area" class="flex-1 overflow-auto p-4 md:p-8 relative">
+            <!-- Views -->
+            <div id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
                 
-                <!-- DASHBOARD -->
-                <div id="view-dashboard" class="view-section fade-in">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-green-600 pl-3">Dashboard Overview</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-green-500">
-                            <div class="text-gray-500 text-sm mb-1">Total Students</div>
-                            <div class="text-3xl font-bold text-gray-800" id="dash-total-students">0</div>
+                <!-- 1. DASHBOARD -->
+                <div id="view-dashboard" class="view-section animate-fade-in">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Overview</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Total Students</p>
+                                    <h3 class="text-3xl font-bold text-gray-800" id="dash-total-students">0</h3>
+                                </div>
+                                <div class="bg-emerald-100 p-3 rounded-full text-emerald-600"><i class="fas fa-users"></i></div>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-blue-500">
-                            <div class="text-gray-500 text-sm mb-1">Classes</div>
-                            <div class="text-3xl font-bold text-gray-800">10</div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-amber-500">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Classes</p>
+                                    <h3 class="text-3xl font-bold text-gray-800">10</h3>
+                                </div>
+                                <div class="bg-amber-100 p-3 rounded-full text-amber-600"><i class="fas fa-layer-group"></i></div>
+                            </div>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm border-b-4 border-yellow-500">
-                            <div class="text-gray-500 text-sm mb-1">Receipts Issued</div>
-                            <div class="text-3xl font-bold text-gray-800" id="dash-total-receipts">0</div>
+                         <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Receipts Issued</p>
+                                    <h3 class="text-3xl font-bold text-gray-800" id="dash-total-receipts">0</h3>
+                                </div>
+                                <div class="bg-blue-100 p-3 rounded-full text-blue-600"><i class="fas fa-file-invoice"></i></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="bg-green-50 p-6 rounded-xl border border-green-100">
-                        <h3 class="font-bold text-green-800 mb-2">Welcome Back!</h3>
-                        <p class="text-green-700">Use the sidebar to manage students, record scores, and generate the new A4 Report Cards.</p>
+
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <h3 class="font-bold text-gray-700 mb-4">Quick Actions</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <button onclick="nav('students')" class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition">Add Student</button>
+                            <button onclick="nav('finance')" class="px-4 py-2 bg-amber-50 text-amber-700 rounded-lg hover:bg-amber-100 transition">New Receipt</button>
+                            <button onclick="nav('marks')" class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition">Enter Marks</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- STUDENTS -->
-                <div id="view-students" class="view-section hidden fade-in">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800 border-l-4 border-green-600 pl-3">Student Management</h2>
-                        <button onclick="openModal('student-modal')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition shadow"><i class="fas fa-plus mr-2"></i> Add Student</button>
+                <!-- 2. STUDENTS -->
+                <div id="view-students" class="view-section hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Student Management</h2>
+                        <button onclick="openModal('add-student-modal')" class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 shadow-md transition"><i class="fas fa-plus mr-2"></i> Add Student</button>
                     </div>
-                    
+
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <div class="p-4 border-b flex gap-4">
-                            <select id="filter-class" onchange="renderStudents()" class="border rounded px-3 py-2 text-sm">
-                                <option value="all">All Classes</option>
+                        <div class="p-4 border-b border-gray-100 flex gap-4 flex-wrap">
+                             <select id="filter-class-student" class="border rounded-lg px-3 py-2 text-sm w-full md:w-64" onchange="loadStudents()">
+                                <option value="All">All Classes</option>
                             </select>
-                            <input type="text" id="search-student" onkeyup="renderStudents()" placeholder="Search name..." class="border rounded px-3 py-2 text-sm w-full max-w-xs">
+                            <input type="text" id="search-student" placeholder="Search by name..." class="border rounded-lg px-3 py-2 text-sm w-full md:w-64" onkeyup="filterStudentsTable()">
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[600px]">
                                 <thead class="bg-gray-50 text-gray-600 text-sm uppercase">
                                     <tr>
-                                        <th class="p-4 border-b">Photo</th>
-                                        <th class="p-4 border-b">Name</th>
-                                        <th class="p-4 border-b">Class</th>
-                                        <th class="p-4 border-b text-right">Actions</th>
+                                        <th class="p-4">Photo</th>
+                                        <th class="p-4">Name</th>
+                                        <th class="p-4">Class</th>
+                                        <th class="p-4 text-center">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="student-table-body" class="text-sm text-gray-700">
-                                    <!-- Rows populated by JS -->
+                                <tbody id="students-table-body" class="text-sm text-gray-700 divide-y divide-gray-100">
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- SUBJECTS -->
-                <div id="view-subjects" class="view-section hidden fade-in">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-green-600 pl-3">Subject Management</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 class="font-bold mb-4">Add Subject</h3>
-                            <form onsubmit="handleAddSubject(event)" class="space-y-4">
-                                <select id="subject-class" class="w-full border rounded p-2" required></select>
-                                <input type="text" id="subject-name" placeholder="Subject Name (e.g., Mathematics)" class="w-full border rounded p-2" required>
-                                <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Add Subject</button>
+                <!-- 3. SUBJECTS -->
+                <div id="view-subjects" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Subject Allocation</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm h-fit">
+                            <h3 class="font-bold text-lg mb-4">Add Subject</h3>
+                            <form id="add-subject-form" class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Class</label>
+                                    <select id="subject-class" class="w-full border p-2 rounded mt-1 bg-gray-50"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Subject Name</label>
+                                    <input type="text" id="subject-name" class="w-full border p-2 rounded mt-1 bg-gray-50" placeholder="e.g. Mathematics" required>
+                                </div>
+                                <button type="submit" class="w-full bg-emerald-600 text-white py-2 rounded hover:bg-emerald-700">Add Subject</button>
                             </form>
                         </div>
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 class="font-bold mb-4">Existing Subjects</h3>
-                            <select id="filter-subject-class" onchange="renderSubjects()" class="w-full border rounded p-2 mb-4"></select>
-                            <ul id="subject-list" class="space-y-2">
-                                <!-- List populated by JS -->
-                            </ul>
+                        <div class="md:col-span-2 bg-white p-6 rounded-xl shadow-sm">
+                            <h3 class="font-bold text-lg mb-4">Subject List</h3>
+                            <div class="overflow-y-auto max-h-96">
+                                <ul id="subjects-list" class="space-y-2"></ul>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- SCORES -->
-                <div id="view-scores" class="view-section hidden fade-in">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-green-600 pl-3">Record Scores</h2>
+                <!-- 4. MARKS -->
+                <div id="view-marks" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Marks Entry</h2>
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <select id="score-class" class="border rounded p-2" onchange="loadScoreEntry()"></select>
-                            <select id="score-subject" class="border rounded p-2" onchange="loadScoreEntry()"></select>
-                            <button onclick="saveAllScores()" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Save All Changes</button>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600">Class</label>
+                                <select id="marks-class" class="w-full border p-2 rounded mt-1" onchange="loadSubjectsForMarks()"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600">Subject</label>
+                                <select id="marks-subject" class="w-full border p-2 rounded mt-1"></select>
+                            </div>
+                            <button onclick="loadMarksTable()" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Load Sheet</button>
+                        </div>
+                    </div>
+
+                    <div id="marks-entry-container" class="hidden bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+                            <h3 class="font-bold text-gray-700">Score Sheet</h3>
+                            <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Auto-saving disabled. Click Save.</span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead class="bg-gray-100">
+                            <table class="w-full text-sm text-left min-w-[600px]">
+                                <thead class="bg-gray-100 text-gray-700">
                                     <tr>
-                                        <th class="p-3 border">Student</th>
-                                        <th class="p-3 border w-24">CA 1 (20)</th>
-                                        <th class="p-3 border w-24">CA 2 (20)</th>
-                                        <th class="p-3 border w-24">Exam (60)</th>
-                                        <th class="p-3 border w-20 bg-gray-50">Total</th>
-                                        <th class="p-3 border w-20 bg-gray-50">Grade</th>
+                                        <th class="p-3">Student Name</th>
+                                        <th class="p-3 w-24">CA1 (20)</th>
+                                        <th class="p-3 w-24">CA2 (20)</th>
+                                        <th class="p-3 w-24">Exam (60)</th>
+                                        <th class="p-3 w-24">Total</th>
+                                        <th class="p-3 w-24">Grade</th>
                                     </tr>
                                 </thead>
-                                <tbody id="score-table-body">
-                                    <!-- Score inputs -->
-                                </tbody>
+                                <tbody id="marks-tbody"></tbody>
                             </table>
+                        </div>
+                        <div class="p-4 bg-gray-50 border-t text-right">
+                             <button onclick="deleteMarksForSubject()" class="mr-4 text-red-600 hover:text-red-800 text-sm font-bold">Clear All Marks for this Subject</button>
+                            <button onclick="saveMarks()" class="bg-emerald-600 text-white px-8 py-2 rounded shadow hover:bg-emerald-700">Save All Marks</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- REPORT CARDS -->
-                <div id="view-report-cards" class="view-section hidden fade-in">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-green-600 pl-3">Generate Report Cards</h2>
-                    <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                            <select id="report-class" class="border rounded p-2"></select>
-                            <div class="flex flex-col">
-                                <label class="text-xs text-gray-500">Next Term Begins</label>
-                                <input type="date" id="next-term-date" class="border rounded p-2">
+                <!-- 5. REPORTS -->
+                <div id="view-reports" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Report Cards</h2>
+                    <div class="bg-white p-6 rounded-xl shadow-sm mb-6 no-print">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600">Class</label>
+                                <select id="report-class" class="w-full border p-2 rounded mt-1"></select>
                             </div>
-                             <div class="flex flex-col">
-                                <label class="text-xs text-gray-500">Term</label>
-                                <select id="report-term" class="border rounded p-2">
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600">Term</label>
+                                <select id="report-term" class="w-full border p-2 rounded mt-1">
                                     <option value="1st Term">1st Term</option>
                                     <option value="2nd Term">2nd Term</option>
                                     <option value="3rd Term">3rd Term</option>
                                 </select>
                             </div>
-                            <button onclick="generateReportCards()" class="bg-green-600 text-white p-2 rounded hover:bg-green-700">Generate & Preview</button>
+                            <div>
+                                <label class="block text-sm font-bold text-gray-600">Next Term Begins</label>
+                                <input type="date" id="next-term-date" class="w-full border p-2 rounded mt-1">
+                            </div>
+                            <button onclick="generateReportList()" class="bg-emerald-600 text-white px-6 py-2 rounded hover:bg-emerald-700">Generate</button>
                         </div>
-                        <div class="flex gap-4">
-                            <button onclick="exportExcel()" class="bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"><i class="fas fa-file-excel"></i> Export Excel</button>
+                    </div>
+
+                    <div id="report-list-container" class="hidden bg-white rounded-xl shadow-sm p-6 no-print">
+                         <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                            <h3 class="font-bold">Class List</h3>
+                            <div class="flex gap-2">
+                                <button onclick="exportExcel()" class="bg-green-700 text-white px-3 py-1 rounded text-sm"><i class="fas fa-file-excel mr-1"></i> Excel</button>
+                                <button onclick="printAllReports()" class="bg-purple-700 text-white px-4 py-2 rounded text-sm font-bold shadow-lg hover:bg-purple-800 transition"><i class="fas fa-print mr-1"></i> BULK PRINT CLASS</button>
+                            </div>
                         </div>
-                        <div id="report-list" class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <!-- List of students to print individually -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left min-w-[500px]">
+                                <thead class="bg-gray-100">
+                                    <tr>
+                                        <th class="p-2">Pos</th>
+                                        <th class="p-2">Student</th>
+                                        <th class="p-2">Avg</th>
+                                        <th class="p-2">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-list-tbody"></tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- FINANCE/RECEIPTS -->
-                <div id="view-finance" class="view-section hidden fade-in">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-green-600 pl-3">Receipt Management</h2>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Create Receipt -->
+                <!-- 6. FINANCE -->
+                <div id="view-finance" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Receipt Management</h2>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
+                        <!-- New Receipt Form -->
                         <div class="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 class="font-bold mb-4">New Receipt</h3>
-                            <form onsubmit="generateReceipt(event)" class="space-y-4">
+                            <h3 class="font-bold text-lg mb-4 text-emerald-800">New Receipt</h3>
+                            <form id="receipt-form" class="space-y-3">
                                 <div>
-                                    <label class="block text-sm font-medium">Student Name</label>
-                                    <input type="text" id="receipt-name" class="w-full border rounded p-2" required>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium">Class</label>
-                                    <select id="receipt-class" class="w-full border rounded p-2" required></select>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium">Amount (₦)</label>
-                                        <input type="number" id="receipt-amount" class="w-full border rounded p-2" required>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium">Date</label>
-                                        <input type="date" id="receipt-date" class="w-full border rounded p-2" required>
-                                    </div>
+                                    <label class="block text-xs font-bold text-gray-500">Class</label>
+                                    <select id="receipt-class" class="w-full border p-2 rounded mt-1 bg-gray-50" onchange="updateReceiptStudents()"></select>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium">Payment For</label>
-                                    <input type="text" id="receipt-purpose" placeholder="e.g., School Fees, Uniform" class="w-full border rounded p-2" required>
+                                    <label class="block text-xs font-bold text-gray-500">Student</label>
+                                    <select id="receipt-student" class="w-full border p-2 rounded mt-1 bg-gray-50"></select>
                                 </div>
-                                <button type="submit" class="w-full bg-green-600 text-white py-2 rounded font-bold hover:bg-green-700">Generate & Print</button>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500">Payment For</label>
+                                    <input type="text" id="receipt-purpose" class="w-full border p-2 rounded mt-1 bg-gray-50" placeholder="e.g. School Fees" required>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500">Amount (₦)</label>
+                                    <input type="number" id="receipt-amount" class="w-full border p-2 rounded mt-1 bg-gray-50" required>
+                                </div>
+                                 <div>
+                                    <label class="block text-xs font-bold text-gray-500">Date</label>
+                                    <input type="date" id="receipt-date" class="w-full border p-2 rounded mt-1 bg-gray-50" required>
+                                </div>
+                                <button type="submit" class="w-full bg-emerald-700 text-white py-2 rounded hover:bg-emerald-800">Generate & Save</button>
                             </form>
                         </div>
 
-                        <!-- History -->
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 class="font-bold mb-4">Recent Transactions</h3>
-                            <div class="overflow-y-auto max-h-96">
-                                <table class="w-full text-sm">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="p-2 text-left">No.</th>
-                                            <th class="p-2 text-left">Student</th>
-                                            <th class="p-2 text-left">Amount</th>
-                                            <th class="p-2 text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="receipt-history"></tbody>
-                                </table>
+                        <!-- History & Validation -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-lg mb-4 text-gray-700">Validate Receipt</h3>
+                                <div class="flex gap-2">
+                                    <input type="text" id="validate-receipt-no" placeholder="Enter Receipt No (e.g. RCP-1234)" class="flex-1 border p-2 rounded">
+                                    <button onclick="validateReceipt()" class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700">Check</button>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-lg mb-4 text-gray-700">Transaction History</h3>
+                                <div class="overflow-y-auto max-h-64">
+                                    <table class="w-full text-sm text-left min-w-[500px]">
+                                        <thead class="bg-gray-50 sticky top-0">
+                                            <tr>
+                                                <th class="p-2">No.</th>
+                                                <th class="p-2">Student</th>
+                                                <th class="p-2">Amount</th>
+                                                <th class="p-2">Date</th>
+                                                <th class="p-2 text-right">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="receipt-history-tbody"></tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- TIMETABLE -->
-                <div id="view-timetable" class="view-section hidden fade-in">
-                    <h2 class="text-2xl font-bold mb-6 text-gray-800 border-l-4 border-green-600 pl-3">Timetable Generator</h2>
-                    <div class="bg-white p-6 rounded-xl shadow-sm">
-                        <div class="flex gap-4 mb-6">
-                            <select id="timetable-class" class="border rounded p-2 w-64"></select>
-                            <button onclick="renderTimetableEditor()" class="bg-blue-600 text-white px-4 py-2 rounded">Load</button>
-                            <button onclick="printTimetable()" class="bg-gray-800 text-white px-4 py-2 rounded"><i class="fas fa-print"></i> Print A4 Landscape</button>
+                <!-- 7. TIMETABLE -->
+                <div id="view-timetable" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Class Timetables</h2>
+                    <div class="bg-white p-6 rounded-xl shadow-sm mb-6 no-print">
+                         <div class="flex gap-4 items-end flex-wrap">
+                            <div class="flex-1 min-w-[200px]">
+                                <label class="block text-sm font-bold text-gray-600">Select Class</label>
+                                <select id="timetable-class" class="w-full border p-2 rounded mt-1"></select>
+                            </div>
+                            <button onclick="loadTimetable()" class="bg-blue-600 text-white px-6 py-2 rounded">Load</button>
+                            <button onclick="printTimetable()" class="bg-gray-800 text-white px-6 py-2 rounded"><i class="fas fa-print"></i> Print</button>
                         </div>
-                        
-                        <div class="overflow-x-auto border rounded-lg">
-                            <table id="timetable-editor" class="w-full text-center border-collapse text-sm">
-                                <thead>
-                                    <tr class="bg-green-800 text-white">
-                                        <th class="p-2 border border-green-600">Day/Period</th>
-                                        <th class="p-2 border border-green-600">1<br>8:00-8:40</th>
-                                        <th class="p-2 border border-green-600">2<br>8:40-9:20</th>
-                                        <th class="p-2 border border-green-600">3<br>9:20-10:00</th>
-                                        <th class="p-2 border border-green-600 bg-red-800">BREAK<br>10:00-10:30</th>
-                                        <th class="p-2 border border-green-600">4<br>10:30-11:10</th>
-                                        <th class="p-2 border border-green-600">5<br>11:10-11:50</th>
-                                        <th class="p-2 border border-green-600">6<br>11:50-12:30</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="timetable-body">
-                                    <!-- Generated rows -->
-                                </tbody>
-                            </table>
+                    </div>
+                    
+                    <div id="timetable-container" class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto">
+                        <div id="timetable-print-wrapper" class="min-w-[800px] md:min-w-0">
+                            <!-- Injected Table -->
                         </div>
+                        <button onclick="saveTimetable()" class="mt-4 bg-emerald-600 text-white px-6 py-2 rounded no-print">Save Timetable</button>
                     </div>
                 </div>
 
@@ -423,46 +552,40 @@
         </main>
     </div>
 
-    <!-- MODALS -->
-    <!-- Add Student Modal -->
-    <div id="student-modal" class="fixed inset-0 z-40 hidden flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 slide-up">
-            <h3 class="text-xl font-bold mb-4">Add/Edit Student</h3>
-            <form id="student-form" onsubmit="handleStudentSave(event)">
-                <input type="hidden" id="student-id">
-                <div class="mb-4 text-center">
-                    <div class="w-24 h-24 mx-auto bg-gray-200 rounded-full overflow-hidden mb-2 border-2 border-green-500">
-                        <img id="preview-photo" src="" class="w-full h-full object-cover hidden">
-                        <i id="default-icon" class="fas fa-camera text-gray-400 text-3xl mt-8"></i>
-                    </div>
-                    <label class="cursor-pointer text-blue-600 text-sm hover:underline">
-                        Upload Photo
-                        <input type="file" id="student-photo" accept="image/*" class="hidden" onchange="previewImage(this)">
-                    </label>
+    <!-- DEDICATED GLOBAL PRINT CONTAINER -->
+    <!-- This is the ONLY thing that will appear when printing -->
+    <div id="global-print-container" class="hidden"></div>
+
+    <!-- ADD STUDENT MODAL -->
+    <div id="add-student-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 m-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Student</h3>
+            <form id="create-student-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="new-std-name" class="w-full border p-2 rounded mt-1" required>
                 </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-medium">Full Name</label>
-                    <input type="text" id="student-name" class="w-full border rounded p-2" required>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Class</label>
+                    <select id="new-std-class" class="w-full border p-2 rounded mt-1"></select>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium">Class</label>
-                    <select id="student-class-select" class="w-full border rounded p-2" required></select>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Photo</label>
+                    <input type="file" id="new-std-photo" accept="image/*" class="w-full border p-2 rounded mt-1 text-sm">
+                    <p class="text-xs text-gray-500 mt-1">Max 100KB. Resize locally if needed.</p>
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button type="button" onclick="closeModal('student-modal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Save Student</button>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal('add-student-modal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Save Student</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Hidden Print Area -->
-    <div id="print-area"></div>
-
-    <!-- FIREBASE & APP LOGIC -->
+    <!-- SCRIPTS -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // CONFIG
         const firebaseConfig = {
@@ -475,927 +598,923 @@
             measurementId: "G-NQ2Q9RLLSC"
         };
 
-        // CONSTANTS
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- GLOBAL VARIABLES ---
         const CLASSES = [
-            "Pre-Nursery", 
-            "Nursery 1", "Nursery 2", 
+            "Pre-Nursery", "Nursery 1", "Nursery 2", 
             "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6",
             "Islamiyya"
         ];
         
-        const GRADING_SCALE = [
-            { min: 90, max: 100, grade: "1A", remark: "Distinction" },
-            { min: 85, max: 89, grade: "1B", remark: "Excellent" },
-            { min: 80, max: 84, grade: "2A", remark: "Very Good" },
-            { min: 75, max: 79, grade: "2B", remark: "Good" },
-            { min: 70, max: 74, grade: "3A", remark: "Credit" },
-            { min: 65, max: 69, grade: "3B", remark: "Pass" },
-            { min: 60, max: 64, grade: "4A", remark: "Fair" },
-            { min: 50, max: 59, grade: "4B", remark: "Weak" },
-            { min: 0, max: 49, grade: "F", remark: "Fail" }
-        ];
-
-        // STATE
-        let db;
-        let useLocalStorage = false;
-        let appData = {
-            students: [],
-            subjects: [],
-            scores: [],
-            receipts: [],
-            timetable: {}
-        };
-
-        // --- NEW SVG STAMP GENERATOR ---
-        window.getStampSVG = (type, date) => {
-            const color = type === 'PAID' ? '#d93025' : '#047857'; // Red for PAID, Green for Official
-            const id = Math.random().toString(36).substr(2, 9); // Unique ID for paths
-
-            return `
-            <div style="position: relative; display: inline-block; width: 120px; height: 120px; transform: rotate(-15deg); opacity: 0.9;">
-                <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                    <style>
-                        .st-text-${id} { font-family: 'Courier New', monospace; font-weight: bold; fill: ${color}; text-transform: uppercase; }
-                        .st-border-${id} { fill: none; stroke: ${color}; }
-                    </style>
-                    
-                    <!-- Outer/Inner Rings -->
-                    <circle cx="60" cy="60" r="56" class="st-border-${id}" stroke-width="2" />
-                    <circle cx="60" cy="60" r="48" class="st-border-${id}" stroke-width="1" stroke-dasharray="2,2"/>
-                    <circle cx="60" cy="60" r="35" class="st-border-${id}" stroke-width="0.5" opacity="0.5"/>
-                    
-                    <!-- Text Paths -->
-                    <defs>
-                        <path id="curveTop${id}" d="M 14,60 A 46,46 0 1,1 106,60" fill="none" />
-                        <path id="curveBot${id}" d="M 14,60 A 46,46 0 0,0 106,60" fill="none" />
-                    </defs>
-                    
-                    <!-- Arced Text -->
-                    <text class="st-text-${id}" font-size="8.5" letter-spacing="1">
-                        <textPath href="#curveTop${id}" startOffset="50%" text-anchor="middle">NURUL BAYAN SCIENCE ACADEMY</textPath>
-                    </text>
-                    <text class="st-text-${id}" font-size="8" letter-spacing="2">
-                        <textPath href="#curveBot${id}" startOffset="50%" text-anchor="middle">KNOWLEDGE IS SUCCESS</textPath>
-                    </text>
-                    
-                    <!-- Center Text -->
-                    <text x="60" y="58" text-anchor="middle" class="st-text-${id}" font-size="14" font-weight="900" style="text-shadow: 1px 1px 0px rgba(255,255,255,0.8);">${type}</text>
-                    <text x="60" y="72" text-anchor="middle" class="st-text-${id}" font-size="9">${date}</text>
-                    
-                     <!-- Stars -->
-                    <text x="12" y="62" class="st-text-${id}" font-size="10" transform="rotate(-90 12 62)">★</text>
-                    <text x="108" y="62" class="st-text-${id}" font-size="10" transform="rotate(90 108 62)">★</text>
-                </svg>
-                
-                <!-- Grunge/Noise Overlay for realism -->
-                <div style="position: absolute; inset: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwqUAXYwYJAdmjC6AKAQAqQBFt1h955gAAAABJRU5ErkJggg=='); background-repeat: repeat; opacity: 0.15; pointer-events: none; border-radius: 50%; mix-blend-mode: multiply;"></div>
-            </div>
-            `;
-        }
-
-        // INIT
-        async function initApp() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                // Simple connectivity check
-                await getDocs(collection(db, 'test_connection'));
-                console.log("Firebase Connected");
-            } catch (error) {
-                console.warn("Firebase connection failed or permissions denied. Falling back to LocalStorage.", error);
-                useLocalStorage = true;
-                loadFromLocalStorage();
-            }
-
-            setupUI();
-            checkAuth();
-            
-            // Auto-refresh data
-            if(sessionStorage.getItem('nb_auth')) {
-                fetchData();
-            }
-        }
-
-        // --- LOCAL STORAGE FALLBACKS ---
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('nb_data');
-            if (saved) appData = JSON.parse(saved);
-        }
-
-        function saveToLocalStorage() {
-            localStorage.setItem('nb_data', JSON.stringify(appData));
-        }
-
-        // --- DATA OPERATIONS (Unified Interface) ---
-        async function apiAdd(collectionName, data) {
-            data.id = Date.now().toString(); // Simple ID for both
-            if (useLocalStorage) {
-                appData[collectionName] = appData[collectionName] || [];
-                appData[collectionName].push(data);
-                saveToLocalStorage();
-                return data;
-            } else {
-                try {
-                    const docRef = await addDoc(collection(db, collectionName), data);
-                    data.id = docRef.id;
-                    return data;
-                } catch(e) {
-                    // Fallback if rules fail dynamically
-                    useLocalStorage = true;
-                    return apiAdd(collectionName, data);
-                }
-            }
-        }
-
-        async function apiUpdate(collectionName, id, data) {
-            if (useLocalStorage) {
-                const idx = appData[collectionName].findIndex(i => i.id === id);
-                if (idx !== -1) {
-                    appData[collectionName][idx] = { ...appData[collectionName][idx], ...data };
-                    saveToLocalStorage();
-                }
-            } else {
-                 try {
-                    await updateDoc(doc(db, collectionName, id), data);
-                 } catch(e) { useLocalStorage = true; apiUpdate(collectionName, id, data); }
-            }
-        }
-
-        async function apiDelete(collectionName, id) {
-             if (useLocalStorage) {
-                appData[collectionName] = appData[collectionName].filter(i => i.id !== id);
-                saveToLocalStorage();
-            } else {
-                try { await deleteDoc(doc(db, collectionName, id)); }
-                catch(e) { useLocalStorage = true; apiDelete(collectionName, id); }
-            }
-        }
-
-        async function fetchData() {
-            // If using LocalStorage, data is already loaded in appData. 
-            // If Firebase, fetch all collections.
-            if (!useLocalStorage) {
-                try {
-                    const sSnap = await getDocs(collection(db, 'students'));
-                    appData.students = sSnap.docs.map(d => ({id: d.id, ...d.data()}));
-
-                    const subSnap = await getDocs(collection(db, 'subjects'));
-                    appData.subjects = subSnap.docs.map(d => ({id: d.id, ...d.data()}));
-
-                    const scSnap = await getDocs(collection(db, 'scores'));
-                    appData.scores = scSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                    
-                    const rSnap = await getDocs(collection(db, 'receipts'));
-                    appData.receipts = rSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                } catch (e) {
-                    console.log("Switching to local storage due to fetch error");
-                    useLocalStorage = true;
-                    loadFromLocalStorage();
-                }
-            }
-            updateDashboard();
-        }
-
+        let currentUser = sessionStorage.getItem('user');
+        
         // --- AUTHENTICATION ---
-        window.handleLogin = (e) => {
+        window.login = function(e) {
             e.preventDefault();
             const u = document.getElementById('username').value;
             const p = document.getElementById('password').value;
             
-            if (u === 'Edu' && p === 'Edu123') {
-                sessionStorage.setItem('nb_auth', 'true');
-                checkAuth();
-                fetchData();
+            if(u === 'Edu' && p === 'Edu123') {
+                sessionStorage.setItem('user', 'admin');
+                currentUser = 'admin';
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-container').classList.remove('hidden');
+                initApp();
             } else {
-                document.getElementById('login-error').classList.remove('hidden');
+                showToast('Invalid credentials', 'error');
             }
         };
 
-        window.logout = () => {
-            sessionStorage.removeItem('nb_auth');
+        window.logout = function() {
+            sessionStorage.removeItem('user');
             location.reload();
         };
 
-        function checkAuth() {
-            const isAuth = sessionStorage.getItem('nb_auth');
-            const loginScreen = document.getElementById('login-screen');
-            const appContainer = document.getElementById('app-container');
-            
-            if (isAuth) {
-                loginScreen.classList.add('hidden');
-                appContainer.classList.remove('hidden');
-                updateDashboard(); // Initial Update
-            } else {
-                loginScreen.classList.remove('hidden');
-                appContainer.classList.add('hidden');
-            }
+        document.getElementById('login-form').addEventListener('submit', window.login);
+
+        if(currentUser) {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            initApp();
         }
 
-        // --- UI & NAVIGATION ---
-        function setupUI() {
-            // Populate Class Selects
-            const selectors = ['student-class-select', 'filter-class', 'subject-class', 'filter-subject-class', 'score-class', 'report-class', 'receipt-class', 'timetable-class'];
-            selectors.forEach(id => {
+        // --- NAVIGATION ---
+        window.nav = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-' + viewId).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-800', 'border-emerald-400');
+                btn.classList.add('border-transparent');
+            });
+            event.currentTarget.classList.add('bg-emerald-800', 'border-emerald-400');
+            event.currentTarget.classList.remove('border-transparent');
+
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('hidden');
+            }
+
+            if(viewId === 'dashboard') loadDashboardStats();
+            if(viewId === 'finance') loadReceiptHistory();
+        };
+
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('hidden');
+        });
+
+        // --- INITIALIZATION ---
+        function initApp() {
+            populateClassDropdowns();
+            loadDashboardStats();
+            loadStudents();
+            loadSubjectsList();
+        }
+
+        function populateClassDropdowns() {
+            const ids = ['new-std-class', 'filter-class-student', 'subject-class', 'marks-class', 'report-class', 'receipt-class', 'timetable-class'];
+            ids.forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
-                // Keep "All" for filters
-                if (id.includes('filter') && !id.includes('subject')) return;
+                const hasAll = el.querySelector('option[value="All"]');
+                el.innerHTML = hasAll ? '<option value="All">All Classes</option>' : '';
                 
-                el.innerHTML = id.includes('filter') ? '<option value="all">All Classes</option>' : '';
                 CLASSES.forEach(c => {
                     const opt = document.createElement('option');
                     opt.value = c;
-                    opt.innerText = c;
+                    opt.textContent = c;
                     el.appendChild(opt);
                 });
             });
-
-            // Set Sidebar Active
-            window.navigate = (viewId) => {
-                document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-                document.getElementById('view-' + viewId).classList.remove('hidden');
-                
-                // Mobile close sidebar
-                if(window.innerWidth < 768) {
-                    document.getElementById('sidebar').classList.add('hidden');
-                }
-
-                if(viewId === 'students') renderStudents();
-                if(viewId === 'subjects') renderSubjects();
-                if(viewId === 'scores') loadScoreEntry();
-                if(viewId === 'finance') renderReceiptHistory();
-            };
-
-            window.toggleSidebar = () => {
-                document.getElementById('sidebar').classList.toggle('hidden');
-            };
-
-            window.openModal = (id) => {
-                document.getElementById(id).classList.remove('hidden');
-            };
-
-            window.closeModal = (id) => {
-                document.getElementById(id).classList.add('hidden');
-            };
-
-            // Image Preview
-            window.previewImage = (input) => {
-                if (input.files && input.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        document.getElementById('preview-photo').src = e.target.result;
-                        document.getElementById('preview-photo').classList.remove('hidden');
-                        document.getElementById('default-icon').classList.add('hidden');
-                    }
-                    reader.readAsDataURL(input.files[0]);
-                }
-            };
         }
 
-        // --- DASHBOARD ---
-        function updateDashboard() {
-            document.getElementById('dash-total-students').innerText = appData.students ? appData.students.length : 0;
-            document.getElementById('dash-total-receipts').innerText = appData.receipts ? appData.receipts.length : 0;
-        }
-
-        // --- STUDENTS ---
-        window.handleStudentSave = async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('student-id').value;
-            const name = document.getElementById('student-name').value;
-            const sClass = document.getElementById('student-class-select').value;
-            const fileInput = document.getElementById('student-photo');
-            
-            let photoBase64 = document.getElementById('preview-photo').src;
-            if(fileInput.files.length > 0) {
-                // Already read in previewImage, src is set
-            } else if (!photoBase64.includes('data:')) {
-                photoBase64 = ""; // No image
-            }
-
-            const studentData = { name, class: sClass, photo: photoBase64 };
-
-            if (id) {
-                await apiUpdate('students', id, studentData);
-            } else {
-                await apiAdd('students', studentData);
-            }
-
-            closeModal('student-modal');
-            document.getElementById('student-form').reset();
-            document.getElementById('preview-photo').src = "";
-            document.getElementById('preview-photo').classList.add('hidden');
-            document.getElementById('default-icon').classList.remove('hidden');
-            document.getElementById('student-id').value = "";
-            
-            await fetchData(); // Refresh local data
-            renderStudents();
+        // --- UTILS ---
+        window.showToast = function(msg, type='success') {
+            const container = document.getElementById('toast-container');
+            const div = document.createElement('div');
+            div.className = `p-4 rounded shadow-lg text-white font-medium animate-bounce ${type === 'error' ? 'bg-red-500' : 'bg-emerald-600'}`;
+            div.textContent = msg;
+            container.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
         };
 
-        window.renderStudents = () => {
-            const tbody = document.getElementById('student-table-body');
-            tbody.innerHTML = '';
-            
-            const filterClass = document.getElementById('filter-class').value;
-            const search = document.getElementById('search-student').value.toLowerCase();
-            
-            const filtered = appData.students.filter(s => {
-                const matchClass = filterClass === 'all' || s.class === filterClass;
-                const matchName = s.name.toLowerCase().includes(search);
-                return matchClass && matchName;
-            });
+        window.openModal = (id) => document.getElementById(id).classList.add('active');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
 
-            filtered.forEach(s => {
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const scale = 300 / img.width;
+                        canvas.width = 300;
+                        canvas.height = img.height * scale;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+                    }
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // --- STUDENT MANAGEMENT ---
+        document.getElementById('create-student-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('new-std-name').value;
+            const cls = document.getElementById('new-std-class').value;
+            const fileInput = document.getElementById('new-std-photo');
+            
+            let photo = null;
+            if(fileInput.files[0]) {
+                photo = await fileToBase64(fileInput.files[0]);
+            }
+
+            try {
+                await addDoc(collection(db, 'students'), {
+                    name, class: cls, photo, createdAt: new Date()
+                });
+                showToast('Student Added!');
+                closeModal('add-student-modal');
+                e.target.reset();
+                loadStudents();
+            } catch(err) {
+                console.error(err);
+                showToast('Error adding student', 'error');
+            }
+        });
+
+        window.loadStudents = async () => {
+            const filterClass = document.getElementById('filter-class-student').value;
+            const tbody = document.getElementById('students-table-body');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4"><div class="loader mx-auto"></div></td></tr>';
+
+            let q = collection(db, 'students');
+            if(filterClass !== 'All') {
+                q = query(collection(db, 'students'), where('class', '==', filterClass));
+            }
+
+            const snap = await getDocs(q);
+            tbody.innerHTML = '';
+
+            snap.forEach(docSnap => {
+                const s = docSnap.data();
                 const row = `
-                    <tr class="border-b hover:bg-gray-50">
+                    <tr class="hover:bg-gray-50 group">
                         <td class="p-4">
-                            <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                                ${s.photo ? `<img src="${s.photo}" class="w-full h-full object-cover">` : '<i class="fas fa-user text-gray-400 p-2"></i>'}
+                            <div class="h-10 w-10 rounded-full bg-gray-200 overflow-hidden">
+                                ${s.photo ? `<img src="${s.photo}" class="h-full w-full object-cover">` : '<i class="fas fa-user text-gray-400 p-2"></i>'}
                             </div>
                         </td>
-                        <td class="p-4 font-medium">${s.name}</td>
+                        <td class="p-4 font-medium text-gray-800">${s.name}</td>
                         <td class="p-4 text-gray-500">${s.class}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="editStudent('${s.id}')" class="text-blue-600 hover:text-blue-800 mr-3"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteStudent('${s.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i></button>
+                        <td class="p-4 text-center">
+                            <button onclick="deleteStudent('${docSnap.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
-                tbody.innerHTML += row;
+                tbody.insertAdjacentHTML('beforeend', row);
             });
         };
 
         window.deleteStudent = async (id) => {
-            if(confirm('Are you sure?')) {
-                await apiDelete('students', id);
-                fetchData().then(renderStudents);
+            if(confirm('Are you sure? This will delete all marks for this student too.')) {
+                await deleteDoc(doc(db, 'students', id));
+                loadStudents();
+                showToast('Student deleted');
             }
         };
 
-        window.editStudent = (id) => {
-            const s = appData.students.find(x => x.id === id);
-            if(!s) return;
-            document.getElementById('student-id').value = s.id;
-            document.getElementById('student-name').value = s.name;
-            document.getElementById('student-class-select').value = s.class;
-            if(s.photo) {
-                document.getElementById('preview-photo').src = s.photo;
-                document.getElementById('preview-photo').classList.remove('hidden');
-                document.getElementById('default-icon').classList.add('hidden');
-            }
-            openModal('student-modal');
+        window.filterStudentsTable = () => {
+            const term = document.getElementById('search-student').value.toLowerCase();
+            const rows = document.querySelectorAll('#students-table-body tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(term) ? '' : 'none';
+            });
         };
 
         // --- SUBJECTS ---
-        window.handleAddSubject = async (e) => {
+        document.getElementById('add-subject-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const sClass = document.getElementById('subject-class').value;
+            const cls = document.getElementById('subject-class').value;
             const name = document.getElementById('subject-name').value;
-            
-            await apiAdd('subjects', { class: sClass, name: name });
+
+            await addDoc(collection(db, 'subjects'), { className: cls, name });
+            showToast('Subject Added');
             document.getElementById('subject-name').value = '';
-            fetchData().then(renderSubjects);
-        };
+            loadSubjectsList();
+        });
 
-        window.renderSubjects = () => {
-            const list = document.getElementById('subject-list');
+        window.loadSubjectsList = async () => {
+            const list = document.getElementById('subjects-list');
+            const snap = await getDocs(collection(db, 'subjects'));
             list.innerHTML = '';
-            const filter = document.getElementById('filter-subject-class').value || document.getElementById('subject-class').value;
-            
-            // Sync filter select if not set
-            if(!document.getElementById('filter-subject-class').value) {
-                document.getElementById('filter-subject-class').innerHTML = document.getElementById('subject-class').innerHTML;
-            }
-
-            const classSubjects = appData.subjects.filter(s => s.class === filter);
-            
-            classSubjects.forEach(s => {
-                list.innerHTML += `<li class="p-2 border rounded bg-gray-50 flex justify-between">${s.name} <button onclick="deleteSubject('${s.id}')" class="text-red-500"><i class="fas fa-times"></i></button></li>`;
+            snap.forEach(d => {
+                const sub = d.data();
+                list.insertAdjacentHTML('beforeend', `
+                    <li class="flex justify-between p-2 bg-gray-50 rounded border border-gray-100">
+                        <span><span class="font-bold text-xs text-emerald-600 mr-2 px-1 border border-emerald-200 rounded">${sub.className}</span> ${sub.name}</span>
+                        <button onclick="deleteSubject('${d.id}')" class="text-red-400 text-xs hover:text-red-600"><i class="fas fa-trash"></i></button>
+                    </li>
+                `);
             });
         };
-
+        
         window.deleteSubject = async (id) => {
-            await apiDelete('subjects', id);
-            fetchData().then(renderSubjects);
+            if(confirm('Delete subject?')) {
+                await deleteDoc(doc(db, 'subjects', id));
+                loadSubjectsList();
+            }
         };
 
-        // --- SCORES ---
-        window.loadScoreEntry = () => {
-            const sClass = document.getElementById('score-class').value;
-            const subSelect = document.getElementById('score-subject');
-            const tbody = document.getElementById('score-table-body');
-            tbody.innerHTML = '';
-
-            // Update subjects dropdown for this class
-            const subjects = appData.subjects.filter(s => s.class === sClass);
-            subSelect.innerHTML = subjects.length ? '' : '<option>No subjects</option>';
-            subjects.forEach(s => {
+        // --- MARKS ---
+        window.loadSubjectsForMarks = async () => {
+            const cls = document.getElementById('marks-class').value;
+            const subSel = document.getElementById('marks-subject');
+            subSel.innerHTML = '<option>Loading...</option>';
+            
+            const q = query(collection(db, 'subjects'), where('className', '==', cls));
+            const snap = await getDocs(q);
+            subSel.innerHTML = '';
+            snap.forEach(d => {
                 const opt = document.createElement('option');
-                opt.value = s.name; // Use name as ID for simplicity in linking
-                opt.innerText = s.name;
-                subSelect.appendChild(opt);
+                opt.value = d.data().name;
+                opt.textContent = d.data().name;
+                subSel.appendChild(opt);
             });
+        };
 
-            if(!subjects.length) return;
+        window.loadMarksTable = async () => {
+            const cls = document.getElementById('marks-class').value;
+            const sub = document.getElementById('marks-subject').value;
+            if(!sub) return showToast('Select a subject', 'error');
 
-            const selectedSubject = subSelect.value;
-            const students = appData.students.filter(s => s.class === sClass);
+            const tbody = document.getElementById('marks-tbody');
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">Loading...</td></tr>';
 
-            students.forEach(std => {
-                // Find existing score
-                const existing = appData.scores.find(sc => sc.studentId === std.id && sc.subject === selectedSubject && sc.term === 'current'); // Simplified term logic
+            const studentsSnap = await getDocs(query(collection(db, 'students'), where('class', '==', cls)));
+            const marksQ = query(collection(db, 'marks'), where('class', '==', cls), where('subject', '==', sub));
+            const marksSnap = await getDocs(marksQ);
+            const marksMap = {};
+            marksSnap.forEach(d => marksMap[d.data().studentId] = { ...d.data(), docId: d.id });
+
+            tbody.innerHTML = '';
+            studentsSnap.forEach(s => {
+                const std = s.data();
+                const m = marksMap[s.id] || { ca1:0, ca2:0, exam:0 };
+                const total = (Number(m.ca1)+Number(m.ca2)+Number(m.exam));
                 
-                const ca1 = existing ? existing.ca1 : '';
-                const ca2 = existing ? existing.ca2 : '';
-                const exam = existing ? existing.exam : '';
-
-                const row = `
-                    <tr data-sid="${std.id}">
-                        <td class="p-3 border">${std.name}</td>
-                        <td class="p-3 border"><input type="number" class="w-full border p-1 ca1" max="20" value="${ca1}" oninput="calcRow(this)"></td>
-                        <td class="p-3 border"><input type="number" class="w-full border p-1 ca2" max="20" value="${ca2}" oninput="calcRow(this)"></td>
-                        <td class="p-3 border"><input type="number" class="w-full border p-1 exam" max="60" value="${exam}" oninput="calcRow(this)"></td>
-                        <td class="p-3 border font-bold text-center total">-</td>
-                        <td class="p-3 border font-bold text-center grade">-</td>
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr data-sid="${s.id}" data-docid="${m.docId || ''}">
+                        <td class="p-3 font-medium">${std.name}</td>
+                        <td class="p-1"><input type="number" max="20" class="w-full border p-1 rounded mark-input" name="ca1" value="${m.ca1}"></td>
+                        <td class="p-1"><input type="number" max="20" class="w-full border p-1 rounded mark-input" name="ca2" value="${m.ca2}"></td>
+                        <td class="p-1"><input type="number" max="60" class="w-full border p-1 rounded mark-input" name="exam" value="${m.exam}"></td>
+                        <td class="p-3 font-bold text-center total-cell">${total}</td>
+                        <td class="p-3 text-center grade-cell">${calculateGrade(total)}</td>
                     </tr>
-                `;
-                tbody.innerHTML += row;
+                `);
             });
-            // Initial calc
-            document.querySelectorAll('#score-table-body tr').forEach(tr => calcRow(tr.querySelector('input')));
+
+            document.getElementById('marks-entry-container').classList.remove('hidden');
+            
+            document.querySelectorAll('.mark-input').forEach(inp => {
+                inp.addEventListener('input', updateRowTotal);
+            });
         };
 
-        window.calcRow = (input) => {
-            const tr = input.closest('tr');
-            const ca1 = parseFloat(tr.querySelector('.ca1').value) || 0;
-            const ca2 = parseFloat(tr.querySelector('.ca2').value) || 0;
-            const exam = parseFloat(tr.querySelector('.exam').value) || 0;
-            
-            // Limit checks
-            if (ca1 > 20) tr.querySelector('.ca1').value = 20;
-            if (ca2 > 20) tr.querySelector('.ca2').value = 20;
-            if (exam > 60) tr.querySelector('.exam').value = 60;
+        function updateRowTotal(e) {
+            const row = e.target.closest('tr');
+            const ca1 = Number(row.querySelector('[name="ca1"]').value) || 0;
+            const ca2 = Number(row.querySelector('[name="ca2"]').value) || 0;
+            const exam = Number(row.querySelector('[name="exam"]').value) || 0;
+            const total = ca1 + ca2 + exam;
+            row.querySelector('.total-cell').textContent = total;
+            row.querySelector('.grade-cell').textContent = calculateGrade(total);
+        }
 
-            const total = (ca1 + ca2 + exam).toFixed(1);
-            tr.querySelector('.total').innerText = total;
+        function calculateGrade(score) {
+            if(score >= 70) return 'A';
+            if(score >= 60) return 'B';
+            if(score >= 50) return 'C';
+            if(score >= 45) return 'D';
+            if(score >= 40) return 'E';
+            return 'F';
+        }
 
-            // Grade
-            const g = GRADING_SCALE.find(s => total >= s.min && total <= s.max);
-            tr.querySelector('.grade').innerText = g ? g.grade : 'F';
-        };
+        window.saveMarks = async () => {
+            const cls = document.getElementById('marks-class').value;
+            const sub = document.getElementById('marks-subject').value;
+            const rows = document.querySelectorAll('#marks-tbody tr');
+            const batchPromises = [];
 
-        window.saveAllScores = async () => {
-            const sClass = document.getElementById('score-class').value;
-            const subject = document.getElementById('score-subject').value;
-            const rows = document.querySelectorAll('#score-table-body tr');
-            
-            let promises = [];
-            
-            rows.forEach(tr => {
-                const sId = tr.getAttribute('data-sid');
-                const ca1 = tr.querySelector('.ca1').value;
-                const ca2 = tr.querySelector('.ca2').value;
-                const exam = tr.querySelector('.exam').value;
-                
-                if (ca1 || ca2 || exam) {
-                    // Check if update or add
-                    const existing = appData.scores.find(sc => sc.studentId === sId && sc.subject === subject && sc.term === 'current');
-                    
-                    const data = {
-                        studentId: sId,
-                        class: sClass,
-                        subject: subject,
-                        ca1: ca1, ca2: ca2, exam: exam,
-                        term: 'current'
-                    };
+            rows.forEach(row => {
+                const sid = row.dataset.sid;
+                const docId = row.dataset.docid;
+                const ca1 = Number(row.querySelector('[name="ca1"]').value);
+                const ca2 = Number(row.querySelector('[name="ca2"]').value);
+                const exam = Number(row.querySelector('[name="exam"]').value);
+                const total = ca1 + ca2 + exam;
 
-                    if(existing) {
-                        promises.push(apiUpdate('scores', existing.id, data));
-                    } else {
-                        promises.push(apiAdd('scores', data));
-                    }
+                const data = {
+                    studentId: sid,
+                    class: cls,
+                    subject: sub,
+                    ca1, ca2, exam, total,
+                    session: '2025/2026',
+                    term: '1st' 
+                };
+
+                if(docId) {
+                    batchPromises.push(updateDoc(doc(db, 'marks', docId), data));
+                } else {
+                    batchPromises.push(addDoc(collection(db, 'marks'), data));
                 }
             });
 
-            await Promise.all(promises);
-            alert('Scores Saved Successfully!');
-            fetchData();
+            try {
+                await Promise.all(batchPromises);
+                showToast('Marks Saved Successfully');
+                loadMarksTable(); 
+            } catch(err) {
+                showToast('Error saving marks', 'error');
+            }
+        };
+
+        window.deleteMarksForSubject = async () => {
+             const cls = document.getElementById('marks-class').value;
+             const sub = document.getElementById('marks-subject').value;
+             
+             if(confirm(`Delete ALL marks for ${sub} in ${cls}?`)) {
+                 const q = query(collection(db, 'marks'), where('class', '==', cls), where('subject', '==', sub));
+                 const snap = await getDocs(q);
+                 const promises = snap.docs.map(d => deleteDoc(d.ref));
+                 await Promise.all(promises);
+                 showToast('Marks deleted');
+                 loadMarksTable();
+             }
         };
 
         // --- REPORT CARDS (Complex Logic) ---
-        window.generateReportCards = () => {
-            const sClass = document.getElementById('report-class').value;
-            const nextTerm = document.getElementById('next-term-date').value;
-            const termName = document.getElementById('report-term').value;
+        let currentClassReportData = [];
+
+        window.generateReportList = async () => {
+            const cls = document.getElementById('report-class').value;
+            const term = document.getElementById('report-term').value;
             
-            if(!nextTerm) { alert('Please enter Next Term begins date'); return; }
+            if(!document.getElementById('next-term-date').value) {
+                showToast('Please set Next Term Date', 'error');
+                return;
+            }
 
-            const students = appData.students.filter(s => s.class === sClass);
-            const reportList = document.getElementById('report-list');
-            reportList.innerHTML = `<h3 class="w-full col-span-3 text-center mb-4 font-bold">Generated ${students.length} Reports. Click "Print" on a card or <button onclick="printAllReports()" class="text-blue-600 underline">Print All Bulk</button></h3>`;
+            const tbody = document.getElementById('report-list-tbody');
+            tbody.innerHTML = '<tr><td colspan="4">Calculating...</td></tr>';
+            document.getElementById('report-list-container').classList.remove('hidden');
 
-            // Calculate Positions
-            // 1. Get all students' totals average
-            let studentAvgs = students.map(std => {
-                // Get all scores for this student
-                const scores = appData.scores.filter(sc => sc.studentId === std.id && sc.term === 'current');
-                if(scores.length === 0) return { id: std.id, avg: 0 };
+            const stdSnap = await getDocs(query(collection(db, 'students'), where('class', '==', cls)));
+            const students = [];
+            stdSnap.forEach(d => students.push({ ...d.data(), id: d.id }));
+
+            const marksSnap = await getDocs(query(collection(db, 'marks'), where('class', '==', cls)));
+            const marks = [];
+            marksSnap.forEach(d => marks.push(d.data()));
+
+            const processed = students.map(std => {
+                const stdMarks = marks.filter(m => m.studentId === std.id);
+                const totalScore = stdMarks.reduce((sum, m) => sum + m.total, 0);
+                const avg = stdMarks.length ? (totalScore / stdMarks.length).toFixed(1) : 0;
                 
-                let totalScore = 0;
-                scores.forEach(s => {
-                    totalScore += (parseFloat(s.ca1)||0) + (parseFloat(s.ca2)||0) + (parseFloat(s.exam)||0);
-                });
-                return { id: std.id, avg: totalScore / scores.length };
+                return {
+                    student: std,
+                    marks: stdMarks,
+                    totalScore,
+                    average: parseFloat(avg)
+                };
             });
 
-            // 2. Sort descending
-            studentAvgs.sort((a, b) => b.avg - a.avg);
+            processed.sort((a, b) => b.average - a.average);
+            
+            processed.forEach((p, index) => {
+                p.position = index + 1;
+                p.positionDisplay = getCustomPositionTier(p.average);
+            });
 
-            // Generate HTML for each student
-            students.forEach(std => {
-                // Find Rank
-                const rankIndex = studentAvgs.findIndex(x => x.id === std.id);
-                const position = rankIndex + 1;
-                const suffix = (position) => {
-                    const j = position % 10, k = position % 100;
-                    if (j == 1 && k != 11) return position + "st";
-                    if (j == 2 && k != 12) return position + "nd";
-                    if (j == 3 && k != 13) return position + "rd";
-                    return position + "th";
-                };
-                
-                // Get Scores
-                const scores = appData.scores.filter(sc => sc.studentId === std.id && sc.term === 'current');
-                let totalMarks = 0;
-                let rowsHTML = '';
-                
-                scores.forEach(sc => {
-                    const total = (parseFloat(sc.ca1)||0) + (parseFloat(sc.ca2)||0) + (parseFloat(sc.exam)||0);
-                    totalMarks += total;
-                    const gradeObj = GRADING_SCALE.find(s => total >= s.min && total <= s.max) || { grade: 'F', remark: 'Fail' };
-                    
-                    rowsHTML += `
-                        <tr class="text-xs border-b border-gray-300">
-                            <td class="p-1 border-r border-gray-300">${sc.subject}</td>
-                            <td class="p-1 text-center border-r border-gray-300">${sc.ca1||'-'}</td>
-                            <td class="p-1 text-center border-r border-gray-300">${sc.ca2||'-'}</td>
-                            <td class="p-1 text-center border-r border-gray-300">${sc.exam||'-'}</td>
-                            <td class="p-1 text-center border-r border-gray-300 font-bold">${total}</td>
-                            <td class="p-1 text-center border-r border-gray-300 text-${gradeObj.grade.startsWith('F')?'red':'green'}-700 font-bold">${gradeObj.grade}</td>
-                            <td class="p-1 text-center text-xs italic">${gradeObj.remark}</td>
-                        </tr>
-                    `;
-                });
+            currentClassReportData = processed;
 
-                const average = scores.length ? (totalMarks / scores.length).toFixed(2) : 0;
-                
-                // Principal Comment Logic
-                let pComment = "Good result, keep it up.";
-                if(average >= 85) pComment = "An outstanding performance! Keep it up.";
-                else if(average >= 70) pComment = "Very good result. A little more effort will yield excellence.";
-                else if(average >= 50) pComment = "Good attempt, but needs to work harder next term.";
-                else pComment = "Poor performance. Needs serious attention and improvement.";
+            tbody.innerHTML = '';
+            processed.forEach(p => {
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr class="border-b">
+                        <td class="p-2 font-bold">${p.positionDisplay}</td>
+                        <td class="p-2">${p.student.name}</td>
+                        <td class="p-2 font-mono">${p.average}</td>
+                        <td class="p-2">
+                            <button onclick="printReport('${p.student.id}')" class="text-emerald-600 font-bold hover:underline">Print</button>
+                        </td>
+                    </tr>
+                `);
+            });
+        };
+        
+        function getCustomPositionTier(avg) {
+             const score = parseFloat(avg);
+             if (score >= 90) return "1A";
+             if (score >= 80) return "1B";
+             if (score >= 70) return "2A";
+             if (score >= 60) return "2B";
+             if (score >= 50) return "3A";
+             if (score >= 40) return "3B";
+             return "4th";
+        }
 
-                const stampSVG = getStampSVG('OFFICIAL', new Date().toLocaleDateString());
+        // --- BULK PRINTING FUNCTIONALITY ---
+        window.printAllReports = async () => {
+             if(currentClassReportData.length === 0) return showToast('Generate list first', 'error');
+             
+             // Use the global print container
+             const container = document.getElementById('global-print-container');
+             container.innerHTML = ''; 
+             container.classList.remove('hidden');
 
-                const cardHTML = `
-                    <div class="report-card-page bg-white mx-auto relative text-gray-900 font-serif">
-                        <!-- Border container -->
-                        <div class="h-full border-4 border-double border-green-800 p-4 relative">
-                            
-                            <!-- Header -->
-                            <div class="flex justify-between items-center border-b-2 border-green-700 pb-2 mb-2">
-                                <div class="text-center w-full">
-                                    <h1 class="text-2xl font-bold text-green-800 uppercase tracking-widest">Nurul Bayan Science Academy</h1>
-                                    <h2 class="text-xl font-bold arabic-text text-yellow-600">نور البيان الأكاديمية للعلوم</h2>
-                                    <p class="text-xs mt-1">No. 2222 Janbulo Housing Estate, Opposite Afforestation, Dorayi Babba, Gwale LGA, Kano</p>
-                                    <p class="text-xs font-bold">Tel: +234-8119723517, +234-8189231849 | Email: nurulbayanscienceacademy18@gmail.com</p>
-                                    <div class="bg-green-700 text-white text-xs py-1 px-4 rounded-full inline-block mt-1 font-bold">Motto: Knowledge is the Root of Success</div>
-                                </div>
+             // Generate HTML for ALL students
+             for (const data of currentClassReportData) {
+                 const reportHTML = await generateReportHTML(data);
+                 const wrapper = document.createElement('div');
+                 wrapper.className = 'report-page-wrapper';
+                 wrapper.innerHTML = reportHTML;
+                 container.appendChild(wrapper);
+                 
+                 // Generate QR Code
+                 const qrDiv = wrapper.querySelector('.qr-code-placeholder');
+                 const qrImg = wrapper.querySelector('.qr-code-img');
+                 const verifyUrl = `https://nurul-bayan-academy.web.app/verify?id=${data.student.id}`;
+                 
+                 new QRCode(qrDiv, { text: verifyUrl, width: 80, height: 80 });
+                 
+                 // Wait for canvas
+                 await new Promise(r => setTimeout(r, 50)); 
+                 const canvas = qrDiv.querySelector('canvas');
+                 if(canvas) {
+                     qrImg.src = canvas.toDataURL();
+                     qrDiv.style.display = 'none';
+                 }
+             }
+
+             window.print();
+             
+             // Cleanup after print
+             setTimeout(() => {
+                 container.classList.add('hidden');
+                 container.innerHTML = ''; 
+             }, 1000);
+        };
+
+        window.printReport = async (studentId) => {
+            const data = currentClassReportData.find(d => d.student.id === studentId);
+            if(!data) return;
+            
+            const container = document.getElementById('global-print-container');
+            container.innerHTML = '';
+            
+            const reportHTML = await generateReportHTML(data);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'report-page-wrapper';
+            wrapper.innerHTML = reportHTML;
+            container.appendChild(wrapper);
+            container.classList.remove('hidden');
+
+            const qrDiv = wrapper.querySelector('.qr-code-placeholder');
+            const qrImg = wrapper.querySelector('.qr-code-img');
+            const verifyUrl = `https://nurul-bayan-academy.web.app/verify?id=${data.student.id}`;
+            
+            new QRCode(qrDiv, { text: verifyUrl, width: 80, height: 80 });
+            
+            setTimeout(() => {
+                const canvas = qrDiv.querySelector('canvas');
+                if(canvas) {
+                    qrImg.src = canvas.toDataURL();
+                    qrDiv.style.display = 'none';
+                }
+                window.print();
+                 setTimeout(() => {
+                     container.classList.add('hidden');
+                     container.innerHTML = '';
+                 }, 1000);
+            }, 300);
+        };
+
+        async function generateReportHTML(data) {
+            const nextTerm = document.getElementById('next-term-date').value;
+            const term = document.getElementById('report-term').value;
+            const session = '2025 / 2026';
+
+            let comment = "";
+            if(data.average >= 80) comment = "An excellent result. Keep it up!";
+            else if(data.average >= 60) comment = "A good performance, but there is room for improvement.";
+            else comment = "More effort is required next term.";
+
+            let subjectsRows = data.marks.map(m => `
+                <tr>
+                    <td class="p-1 pl-2 border border-emerald-900">${m.subject}</td>
+                    <td class="p-1 text-center border border-emerald-900">${m.ca1}</td>
+                    <td class="p-1 text-center border border-emerald-900">${m.ca2}</td>
+                    <td class="p-1 text-center border border-emerald-900">${m.exam}</td>
+                    <td class="p-1 text-center border border-emerald-900 font-bold">${m.total}</td>
+                    <td class="p-1 text-center border border-emerald-900 font-bold ${getGradeColor(calculateGrade(m.total))}">${calculateGrade(m.total)}</td>
+                </tr>
+            `).join('');
+
+            return `
+                <div class="h-full w-full border-4 border-emerald-800 p-1 bg-white relative text-gray-800 flex flex-col">
+                    <div class="h-full border-2 border-amber-500 p-4 relative flex flex-col flex-grow">
+                        
+                        <!-- Watermark -->
+                        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+                            <i class="fas fa-book-quran text-[400px]"></i>
+                        </div>
+
+                        <!-- Header -->
+                        <div class="flex justify-between items-center border-b-2 border-emerald-800 pb-2 mb-2 flex-shrink-0">
+                            <div class="w-24 text-center">
+                                <div class="text-4xl text-emerald-800"><i class="fas fa-book-open"></i></div>
                             </div>
-
-                            <!-- Student Info -->
-                            <div class="flex gap-4 mb-3 items-end">
-                                <div class="w-24 h-28 border border-gray-400 bg-gray-100 flex-shrink-0">
-                                    ${std.photo ? `<img src="${std.photo}" class="w-full h-full object-cover">` : '<div class="flex items-center justify-center h-full text-xs text-gray-400">No Photo</div>'}
-                                </div>
-                                <div class="flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                                    <div class="flex"><span class="font-bold w-24">Name:</span> <span class="border-b border-dotted border-gray-400 flex-1">${std.name}</span></div>
-                                    <div class="flex"><span class="font-bold w-24">Class:</span> <span class="border-b border-dotted border-gray-400 flex-1">${std.class}</span></div>
-                                    <div class="flex"><span class="font-bold w-24">Term:</span> <span class="border-b border-dotted border-gray-400 flex-1">${termName}</span></div>
-                                    <div class="flex"><span class="font-bold w-24">Session:</span> <span class="border-b border-dotted border-gray-400 flex-1">2025 / 2026</span></div>
-                                    <div class="flex"><span class="font-bold w-24">Position:</span> <span class="border-b border-dotted border-gray-400 flex-1 font-bold text-lg">${suffix(position)}</span></div>
-                                    <div class="flex"><span class="font-bold w-24">No. in Class:</span> <span class="border-b border-dotted border-gray-400 flex-1">${students.length}</span></div>
-                                </div>
+                            <div class="text-center flex-1">
+                                <h2 class="text-2xl arabic-text text-emerald-700 font-bold mb-1">نور البيان الأكاديمية للعلوم</h2>
+                                <h1 class="text-2xl font-bold text-emerald-800 uppercase font-serif tracking-wide leading-tight">Nurul Bayan Science Academy</h1>
+                                <p class="text-xs font-bold mt-1">No. 2222 Janbulo Housing Estate, Opposite Afforestation, Dorayi Babba, Gwale LGA, Kano</p>
+                                <p class="text-[10px] mt-0.5">Tel: +234-8119723517, +234-8189231849 | Email: nurulbayanscienceacademy18@gmail.com</p>
+                                <div class="bg-emerald-800 text-amber-400 text-xs font-bold px-4 py-0.5 mt-1 inline-block rounded-full uppercase tracking-wider">Motto: Knowledge is the Root of Success</div>
                             </div>
+                            <div class="w-24 h-24 border border-gray-300 bg-gray-100 flex items-center justify-center overflow-hidden">
+                                ${data.student.photo ? `<img src="${data.student.photo}" class="w-full h-full object-cover">` : '<span class="text-xs text-gray-400">Photo</span>'}
+                            </div>
+                        </div>
 
-                            <!-- Scores Table -->
-                            <table class="w-full border-collapse border border-gray-800 mb-4">
-                                <thead class="bg-green-100 text-xs">
-                                    <tr>
-                                        <th class="border border-gray-600 p-1 text-left w-1/3">Subject</th>
-                                        <th class="border border-gray-600 p-1 w-10">CA1</th>
-                                        <th class="border border-gray-600 p-1 w-10">CA2</th>
-                                        <th class="border border-gray-600 p-1 w-10">Exam</th>
-                                        <th class="border border-gray-600 p-1 w-10">Total</th>
-                                        <th class="border border-gray-600 p-1 w-10">Grd</th>
-                                        <th class="border border-gray-600 p-1">Remarks</th>
+                        <!-- Student Info Grid -->
+                        <div class="bg-emerald-50 border border-emerald-200 p-2 mb-2 flex-shrink-0">
+                            <div class="grid grid-cols-3 gap-2 text-sm">
+                                <div><span class="font-bold text-emerald-800">Name:</span> <span class="uppercase">${data.student.name}</span></div>
+                                <div><span class="font-bold text-emerald-800">Class:</span> ${data.student.class}</div>
+                                <div><span class="font-bold text-emerald-800">Session:</span> ${session}</div>
+                                <div><span class="font-bold text-emerald-800">Term:</span> ${term}</div>
+                                <div><span class="font-bold text-emerald-800">No. in Class:</span> ${currentClassReportData.length}</div>
+                                <div><span class="font-bold text-emerald-800">Position:</span> <span class="text-red-600 font-bold border border-red-600 px-1 rounded bg-white">${data.positionDisplay}</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Marks Table -->
+                        <div class="flex-grow flex flex-col mb-2">
+                            <table class="w-full text-sm border-collapse">
+                                <thead>
+                                    <tr class="bg-emerald-800 text-white">
+                                        <th class="p-1 border border-emerald-900 text-left pl-2">Subject</th>
+                                        <th class="p-1 border border-emerald-900 w-12">CA1</th>
+                                        <th class="p-1 border border-emerald-900 w-12">CA2</th>
+                                        <th class="p-1 border border-emerald-900 w-12">Exam</th>
+                                        <th class="p-1 border border-emerald-900 w-12">Total</th>
+                                        <th class="p-1 border border-emerald-900 w-12">Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${rowsHTML}
+                                    ${subjectsRows}
                                 </tbody>
-                                <tfoot class="bg-gray-50 text-xs font-bold">
-                                    <tr>
-                                        <td colspan="4" class="p-1 text-right pr-4">Average:</td>
-                                        <td colspan="3" class="p-1 pl-2">${average}</td>
-                                    </tr>
-                                </tfoot>
                             </table>
+                        </div>
 
-                            <!-- Footer Info -->
-                            <div class="mt-auto absolute bottom-4 left-4 right-4">
-                                <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
-                                    <div>
-                                        <p class="font-bold mb-1">Principal's Comment:</p>
-                                        <p class="text-xs italic border-b border-gray-400 pb-1">${pComment}</p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="font-bold mb-1">Next Term Begins:</p>
-                                        <p class="text-xs border-b border-gray-400 pb-1">${new Date(nextTerm).toDateString()}</p>
-                                    </div>
+                        <!-- Summary -->
+                        <div class="flex gap-4 mb-2 flex-shrink-0">
+                            <div class="w-2/3 border border-emerald-800 p-2">
+                                <div class="flex justify-between mb-2 border-b border-gray-200 pb-1">
+                                    <span class="font-bold text-sm">Total Score: ${data.totalScore}</span>
+                                    <span class="font-bold text-sm">Average: ${data.average}</span>
+                                    <span class="font-bold text-sm text-blue-600">Decision: ${data.average > 40 ? 'Promoted' : 'Check Advice'}</span>
                                 </div>
-
-                                <div class="flex justify-between items-center mt-4">
-                                    <div class="text-center">
-                                        <div class="mb-1 mx-auto flex justify-center">
-                                           ${stampSVG}
-                                        </div>
-                                        <p class="text-[10px] font-bold">Principal's Signature</p>
-                                    </div>
-                                    
-                                    <div class="text-center">
-                                        <div id="qr-${std.id}" class="mb-1"></div>
-                                        <p class="text-[9px] text-gray-500">Scan to Verify</p>
-                                    </div>
+                                <div class="text-sm">
+                                    <span class="font-bold text-emerald-800">Principal's Remark:</span>
+                                    <p class="italic font-serif text-gray-700">"${comment}"</p>
                                 </div>
-
-                                <div class="mt-4 border-t border-gray-300 pt-1 text-center">
-                                    <p class="text-[10px] font-bold text-red-600">NOTICE TO PARENTS: Please ensure school fees are paid promptly before resumption.</p>
-                                    <p class="text-[8px] text-gray-400 mt-1">Developed by Abu-Abdurrahman CodeVerge Technology | +2348107907647</p>
+                            </div>
+                            <div class="w-1/3 border border-emerald-800 p-2 text-xs">
+                                <div class="font-bold mb-1">Grading Scale:</div>
+                                <div class="grid grid-cols-2 gap-x-2">
+                                    <span>70-100: A</span>
+                                    <span>60-69: B</span>
+                                    <span>50-59: C</span>
+                                    <span>45-49: D</span>
+                                    <span>40-44: E</span>
+                                    <span>0-39: F</span>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Footer -->
+                        <div class="flex-shrink-0">
+                            <div class="flex justify-between items-end mb-2">
+                                <div class="text-center w-1/3">
+                                    <div class="text-sm font-bold">Next Term Begins:</div>
+                                    <div class="border-b border-black w-full mx-auto mb-1 text-sm">${nextTerm}</div>
+                                </div>
+                                <div class="relative w-1/3 flex justify-center">
+                                    <div class="unique-stamp absolute -top-16">
+                                        <div class="unique-stamp-inner">
+                                            <i class="fas fa-star text-xs text-secondary"></i>
+                                            NURUL BAYAN<br>SCIENCE ACADEMY
+                                            <span class="approved">APPROVED</span>
+                                            OFFICIAL
+                                            <i class="fas fa-star text-xs text-secondary"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-6 w-full">
+                                        <div class="border-b border-black w-3/4 mx-auto mb-1"></div>
+                                        <div class="text-xs font-bold">Principal's Signature</div>
+                                    </div>
+                                </div>
+                                <div class="w-1/3 flex justify-end">
+                                    <div class="qr-code-placeholder mb-1"></div>
+                                    <img class="qr-code-img w-20 h-20" />
+                                </div>
+                            </div>
+                            
+                            <div class="bg-emerald-800 text-white text-[10px] text-center p-1 rounded-sm">
+                                <p class="font-bold">NOTICE TO PARENTS: Keep this report card safe. It is required for next term registration.</p>
+                                <p class="opacity-75 mt-0.5">Developed by Abu-Abdurrahman CodeVerge Technology | +2348107907647</p>
+                            </div>
+                        </div>
                     </div>
-                `;
+                </div>
+            `;
+        }
 
-                // Add to list as a card
-                const wrapper = document.createElement('div');
-                wrapper.className = "bg-gray-100 p-2 rounded border shadow-sm flex flex-col gap-2";
-                wrapper.innerHTML = `
-                    <div class="font-bold text-sm">${std.name}</div>
-                    <div class="text-xs text-gray-500">Pos: ${suffix(position)} | Avg: ${average}</div>
-                    <button class="bg-gray-800 text-white text-xs py-1 rounded hover:bg-black" onclick="printReport('${std.id}')">Print</button>
-                    <!-- Hidden Container for actual HTML storage -->
-                    <div id="html-${std.id}" class="hidden">${cardHTML}</div>
-                `;
-                reportList.appendChild(wrapper);
-
-                // Generate QR Code (Delayed to ensure DOM exists if we were appending directly, but here we generate on demand or in background)
-                // Since qrcode.js needs a DOM element, we do it in print function
-            });
-        };
-
-        window.printReport = (id) => {
-            const content = document.getElementById(`html-${id}`).innerHTML;
-            const printArea = document.getElementById('print-area');
-            printArea.innerHTML = content;
-            
-            // Generate QR
-            const qrDiv = printArea.querySelector(`#qr-${id}`);
-            if(qrDiv) {
-                qrDiv.innerHTML = "";
-                new QRCode(qrDiv, {
-                    text: `NURUL BAYAN\nStudent: ${id}\nTerm: 1st\nValid: YES`,
-                    width: 60,
-                    height: 60,
-                    colorDark : "#047857",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
-            }
-
-            window.print();
-        };
-
-        window.printAllReports = async () => {
-            const cards = document.querySelectorAll('[id^="html-"]');
-            const printArea = document.getElementById('print-area');
-            printArea.innerHTML = ''; // Clear
-
-            // Loop and append all with page breaks
-            cards.forEach(card => {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = card.innerHTML;
-                
-                // Fix QR logic for bulk
-                const id = card.id.replace('html-', '');
-                const qrDiv = tempDiv.querySelector(`#qr-${id}`);
-                
-                // Need to append to DOM to generate QR
-                printArea.appendChild(tempDiv);
-                
-                if(qrDiv) {
-                    new QRCode(qrDiv, {
-                        text: `NURUL BAYAN\nID: ${id}`,
-                        width: 60,
-                        height: 60
-                    });
-                }
-            });
-            
-            setTimeout(() => window.print(), 1000); // Allow QR generation
-        };
-
+        function getGradeColor(g) {
+            if(g==='A') return 'text-green-600';
+            if(g==='B') return 'text-blue-600';
+            if(g==='F') return 'text-red-600';
+            return 'text-gray-800';
+        }
+        
         window.exportExcel = () => {
-            const sClass = document.getElementById('report-class').value;
-            const students = appData.students.filter(s => s.class === sClass);
-            
-            const data = [];
-            students.forEach(std => {
-                 const scores = appData.scores.filter(sc => sc.studentId === std.id && sc.term === 'current');
-                 let row = { "Name": std.name, "Class": std.class };
-                 scores.forEach(s => {
-                     row[`${s.subject} Total`] = (parseFloat(s.ca1)||0) + (parseFloat(s.ca2)||0) + (parseFloat(s.exam)||0);
-                 });
-                 data.push(row);
-            });
-
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, sClass);
-            XLSX.writeFile(wb, `${sClass}_Scores.xlsx`);
+             const ws = XLSX.utils.json_to_sheet(currentClassReportData.map(d => ({
+                 Name: d.student.name,
+                 Average: d.average,
+                 Position: d.positionDisplay
+             })));
+             const wb = XLSX.utils.book_new();
+             XLSX.utils.book_append_sheet(wb, ws, "Report");
+             XLSX.writeFile(wb, "ClassReport.xlsx");
         };
 
-        // --- RECEIPTS ---
-        window.generateReceipt = async (e) => {
+        // --- RECEIPT SYSTEM ---
+        window.updateReceiptStudents = async () => {
+            const cls = document.getElementById('receipt-class').value;
+            const sel = document.getElementById('receipt-student');
+            sel.innerHTML = '<option>Loading...</option>';
+            
+            const q = query(collection(db, 'students'), where('class', '==', cls));
+            const snap = await getDocs(q);
+            sel.innerHTML = '';
+            snap.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d.data().name;
+                opt.textContent = d.data().name;
+                sel.appendChild(opt);
+            });
+        };
+
+        document.getElementById('receipt-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const receipt = {
-                name: document.getElementById('receipt-name').value,
-                class: document.getElementById('receipt-class').value,
-                amount: document.getElementById('receipt-amount').value,
-                date: document.getElementById('receipt-date').value,
-                purpose: document.getElementById('receipt-purpose').value,
-                timestamp: Date.now()
+            const std = document.getElementById('receipt-student').value;
+            const amt = document.getElementById('receipt-amount').value;
+            const pur = document.getElementById('receipt-purpose').value;
+            const date = document.getElementById('receipt-date').value;
+            const cls = document.getElementById('receipt-class').value;
+            const rNo = 'NB-' + Math.floor(1000 + Math.random() * 9000);
+
+            const data = {
+                receiptNo: rNo,
+                student: std,
+                class: cls,
+                amount: amt,
+                purpose: pur,
+                date: date,
+                timestamp: new Date()
             };
 
-            const saved = await apiAdd('receipts', receipt);
-            printReceipt(saved);
-            document.getElementById('receipt-name').value = '';
-            document.getElementById('receipt-amount').value = '';
-            fetchData(); // Update history
+            await addDoc(collection(db, 'receipts'), data);
+            showToast('Receipt Generated!');
+            printReceipt(data);
+            e.target.reset();
+            loadReceiptHistory();
+        });
+
+        window.loadReceiptHistory = async () => {
+            const tbody = document.getElementById('receipt-history-tbody');
+            const snap = await getDocs(query(collection(db, 'receipts')));
+            tbody.innerHTML = '';
+            snap.forEach(d => {
+                const r = d.data();
+                tbody.insertAdjacentHTML('beforeend', `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-2 font-mono text-xs">${r.receiptNo}</td>
+                        <td class="p-2">${r.student}</td>
+                        <td class="p-2 font-bold">₦${r.amount}</td>
+                        <td class="p-2 text-xs">${r.date}</td>
+                        <td class="p-2 text-right">
+                            <button onclick='reprintReceipt(${JSON.stringify(r)})' class="text-blue-600 mr-2"><i class="fas fa-print"></i></button>
+                            <button onclick="deleteReceipt('${d.id}')" class="text-red-500"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `);
+            });
+            document.getElementById('dash-total-receipts').textContent = snap.size;
+        };
+        
+        window.deleteReceipt = async(id) => {
+            if(confirm('Delete this record?')) {
+                await deleteDoc(doc(db, 'receipts', id));
+                loadReceiptHistory();
+            }
         };
 
-        window.printReceipt = (r) => {
-             const printArea = document.getElementById('print-area');
-             const stampSVG = getStampSVG('PAID', r.date);
+        window.reprintReceipt = (data) => printReceipt(data);
 
-             const receiptHTML = `
-                <div class="receipt-page bg-white p-8 border-2 border-gray-800 font-serif relative overflow-hidden">
-                     <!-- Watermark -->
-                    <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-                        <div class="text-9xl font-bold transform -rotate-45">PAID</div>
+        function printReceipt(r) {
+            const area = document.getElementById('global-print-container');
+            area.innerHTML = `
+                 <div class="border-2 border-dashed border-gray-400 p-6 max-w-xl mx-auto relative bg-white mt-8">
+                    <div class="flex items-center gap-4 mb-4 border-b pb-4">
+                         <div class="text-4xl text-emerald-800"><i class="fas fa-university"></i></div>
+                         <div>
+                            <h2 class="font-bold text-xl text-emerald-800">NURUL BAYAN SCIENCE ACADEMY</h2>
+                            <p class="text-xs text-gray-600">No. 2222 Janbulo Housing Estate, Kano</p>
+                            <p class="text-xs text-gray-600">Tel: +234-8119723517</p>
+                         </div>
                     </div>
-
-                    <div class="text-center border-b-2 border-gray-800 pb-4 mb-6">
-                        <h1 class="text-3xl font-bold text-green-800 uppercase">NURUL BAYAN SCIENCE ACADEMY</h1>
-                        <p class="text-sm">No. 2222 Janbulo Housing Estate, Kano</p>
-                        <p class="text-sm font-bold mt-2">OFFICIAL PAYMENT RECEIPT</p>
-                    </div>
-
-                    <div class="flex justify-between mb-6">
-                        <div>
-                            <p><strong>Receipt No:</strong> <span class="text-red-600 font-mono">NB-${r.id.substring(0,6).toUpperCase()}</span></p>
-                            <p><strong>Date:</strong> ${r.date}</p>
+                    
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="bg-gray-100 px-3 py-1 rounded">
+                            <span class="text-xs text-gray-500 uppercase">Receipt No</span>
+                            <div class="font-mono font-bold text-lg">${r.receiptNo}</div>
                         </div>
                         <div class="text-right">
-                             <p><strong>Session:</strong> 2025/2026</p>
+                            <span class="text-xs text-gray-500 uppercase">Date</span>
+                            <div class="font-bold">${r.date}</div>
                         </div>
                     </div>
 
-                    <div class="mb-8 space-y-4 text-lg">
-                        <div class="flex border-b border-dotted border-gray-400 pb-1">
-                            <span class="w-32 font-bold">Received From:</span>
-                            <span class="flex-1 italic">${r.name} (${r.class})</span>
+                    <div class="space-y-3 text-sm mb-8">
+                        <div class="flex justify-between border-b border-dotted py-1">
+                            <span class="text-gray-500">Received From:</span>
+                            <span class="font-bold uppercase">${r.student}</span>
                         </div>
-                        <div class="flex border-b border-dotted border-gray-400 pb-1">
-                            <span class="w-32 font-bold">The Sum of:</span>
-                            <span class="flex-1 font-bold">₦${parseInt(r.amount).toLocaleString()}</span>
+                        <div class="flex justify-between border-b border-dotted py-1">
+                            <span class="text-gray-500">Class:</span>
+                            <span class="font-bold">${r.class}</span>
                         </div>
-                        <div class="flex border-b border-dotted border-gray-400 pb-1">
-                            <span class="w-32 font-bold">Payment For:</span>
-                            <span class="flex-1">${r.purpose}</span>
+                        <div class="flex justify-between border-b border-dotted py-1">
+                            <span class="text-gray-500">Payment For:</span>
+                            <span class="font-bold">${r.purpose}</span>
+                        </div>
+                         <div class="flex justify-between border-b border-dotted py-1">
+                            <span class="text-gray-500">Amount:</span>
+                            <span class="font-bold text-xl text-emerald-800">₦${r.amount}</span>
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-end mt-12">
-                        <div class="text-center w-32">
-                             <div class="border-b border-gray-800 mb-1"></div>
-                             <p class="text-xs">Accountant Sig</p>
+                    <div class="flex justify-between items-end">
+                        <div class="text-[10px] text-gray-400">
+                             Generated by Admin<br>
+                             ${new Date().toLocaleString()}
                         </div>
-                         <div>
-                             ${stampSVG}
-                        </div>
-                        <div class="text-center w-32">
-                             <div class="border-b border-gray-800 mb-1">Manager</div>
-                             <p class="text-xs">Management Sig</p>
+                         <div class="unique-stamp" style="width: 80px; height: 80px; font-size: 8px;">
+                            <div class="unique-stamp-inner">PAID</div>
                         </div>
                     </div>
                     
-                    <div class="text-center text-xs mt-8 text-gray-500">
-                        Generated by Abu-Abdurrahman CodeVerge Technology
+                    <div class="mt-4 text-center text-[10px] text-gray-500 pt-2 border-t">
+                        Dev: Abu-Abdurrahman CodeVerge | +2348107907647
                     </div>
                 </div>
-             `;
-             printArea.innerHTML = receiptHTML;
-             window.print();
-        };
-
-        window.renderReceiptHistory = () => {
-             const list = document.getElementById('receipt-history');
-             list.innerHTML = '';
-             // Sort by newest
-             const sorted = [...appData.receipts].sort((a,b) => b.timestamp - a.timestamp);
-             
-             sorted.forEach(r => {
-                 list.innerHTML += `
-                    <tr class="border-b hover:bg-gray-50">
-                        <td class="p-2 text-xs font-mono text-gray-500">..${r.id.substr(-4)}</td>
-                        <td class="p-2 font-medium">${r.name}</td>
-                        <td class="p-2">₦${parseInt(r.amount).toLocaleString()}</td>
-                        <td class="p-2 text-right">
-                            <button onclick='reprintReceipt("${r.id}")' class="text-blue-600 text-sm hover:underline">Reprint</button>
-                        </td>
-                    </tr>
-                 `;
-             });
-        };
-        
-        window.reprintReceipt = (id) => {
-            const r = appData.receipts.find(x => x.id === id);
-            if(r) printReceipt(r);
-        };
+            `;
+            area.classList.remove('hidden');
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => {
+                     area.classList.add('hidden');
+                     area.innerHTML = '';
+                }, 1000);
+            }, 300);
+        }
 
         // --- TIMETABLE ---
-        window.renderTimetableEditor = () => {
-            const tbody = document.getElementById('timetable-body');
-            tbody.innerHTML = '';
-            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        const periods = ['8:00-8:40', '8:40-9:20', '9:20-10:00', 'Break', '10:30-11:10', '11:10-11:50', '11:50-12:30'];
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+        window.loadTimetable = async () => {
+            const cls = document.getElementById('timetable-class').value;
+            const wrapper = document.getElementById('timetable-print-wrapper');
             
-            days.forEach(day => {
-                let row = `<tr class="border-b"><td class="p-3 font-bold bg-green-50 border-r border-green-200">${day}</td>`;
-                
-                // 6 Periods + Break logic
-                // 1, 2, 3
-                for(let i=1; i<=3; i++) {
-                    row += `<td class="p-1 border-r border-green-100" contenteditable="true"></td>`;
-                }
-                // Break
-                row += `<td class="bg-gray-200 text-xs font-bold text-gray-500 align-middle rotate-0">BREAK</td>`;
-                // 4, 5, 6
-                 for(let i=4; i<=6; i++) {
-                    row += `<td class="p-1 border-r border-green-100" contenteditable="true"></td>`;
-                }
-                row += `</tr>`;
-                tbody.innerHTML += row;
+            const q = query(collection(db, 'timetable'), where('class', '==', cls));
+            const snap = await getDocs(q);
+            let savedData = {};
+            if(!snap.empty) {
+                savedData = JSON.parse(snap.docs[0].data().json);
+                wrapper.dataset.docId = snap.docs[0].id;
+            } else {
+                wrapper.dataset.docId = '';
+            }
+
+            let html = `
+                <div class="print-container">
+                    <div class="text-center mb-6">
+                         <div class="flex justify-between items-center border-b-2 border-emerald-800 pb-2 mb-2">
+                             <div class="text-4xl text-emerald-800"><i class="fas fa-book-open"></i></div>
+                             <div class="text-center">
+                                <h1 class="text-2xl font-bold uppercase text-emerald-800">Nurul Bayan Science Academy</h1>
+                                <div class="bg-amber-500 text-white px-4 py-1 inline-block rounded-full font-bold mt-1 shadow-sm">CLASS TIMETABLE: ${cls}</div>
+                             </div>
+                             <div class="text-4xl text-emerald-800"><i class="fas fa-graduation-cap"></i></div>
+                         </div>
+                    </div>
+                    <table class="w-full border-2 border-emerald-800 text-sm text-center shadow-lg rounded-lg overflow-hidden">
+                        <thead>
+                            <tr class="tt-header">
+                                <th class="p-3 border border-white/20">Day/Time</th>
+                                ${periods.map(p => `<th class="p-3 border border-white/20">${p}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            days.forEach((day, index) => {
+                const bgRow = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                html += `<tr class="${bgRow}"><td class="border border-emerald-200 font-bold bg-emerald-100 text-emerald-900 p-2">${day}</td>`;
+                periods.forEach((p, idx) => {
+                    const key = `${day}-${idx}`;
+                    const val = savedData[key] || '';
+                    if(p === 'Break') {
+                        html += `<td class="border border-emerald-200 bg-amber-100 font-bold text-amber-800 text-xs tracking-widest relative">
+                                    <div class="absolute inset-0 flex items-center justify-center -rotate-45 opacity-50">BREAK</div>
+                                 </td>`;
+                    } else {
+                        html += `<td class="border border-emerald-200 p-0 tt-cell"><input type="text" class="tt-input w-full h-full text-center p-2 outline-none bg-transparent font-medium text-gray-700 placeholder-gray-300" data-key="${key}" value="${val}" placeholder="..."></td>`;
+                    }
+                });
+                html += `</tr>`;
             });
+            
+            html += `</tbody></table>
+                <div class="mt-4 text-center text-xs text-gray-500 font-bold uppercase">Effective from: 2025/2026 Session</div>
+            </div>`;
+            wrapper.innerHTML = html;
+        };
+
+        window.saveTimetable = async () => {
+            const cls = document.getElementById('timetable-class').value;
+            const inputs = document.querySelectorAll('.tt-input');
+            const data = {};
+            inputs.forEach(inp => data[inp.dataset.key] = inp.value);
+            
+            const wrapper = document.getElementById('timetable-print-wrapper');
+            const docId = wrapper.dataset.docId;
+
+            if(docId) {
+                await updateDoc(doc(db, 'timetable', docId), { json: JSON.stringify(data) });
+            } else {
+                await addDoc(collection(db, 'timetable'), { class: cls, json: JSON.stringify(data) });
+            }
+            showToast('Timetable Saved');
         };
 
         window.printTimetable = () => {
-             const tClass = document.getElementById('timetable-class').value;
-             const content = document.getElementById('timetable-editor').outerHTML;
-             
-             const printArea = document.getElementById('print-area');
-             printArea.innerHTML = `
-                <div class="timetable-page bg-white p-4">
-                    <div class="text-center mb-4">
-                        <h1 class="text-2xl font-bold text-green-800">NURUL BAYAN SCIENCE ACADEMY</h1>
-                        <h2 class="text-xl">Class Timetable: <span class="font-bold underline">${tClass}</span></h2>
-                        <p>Session: 2025/2026</p>
-                    </div>
-                    <div class="border-2 border-green-800 p-1">
-                        ${content}
-                    </div>
-                    <div class="mt-4 text-center text-xs">Developed by Abu-Abdurrahman CodeVerge Technology</div>
-                </div>
-             `;
-             
-             // Inject styles into print area context (CSS takes care of .timetable-page)
-             window.print();
+            const inputs = document.querySelectorAll('.tt-input');
+            inputs.forEach(i => {
+                i.parentElement.innerHTML = `<div class="p-2 font-bold text-gray-800 text-center">${i.value}</div>`;
+            });
+            
+            const wrapper = document.getElementById('timetable-print-wrapper');
+            const printArea = document.getElementById('global-print-container');
+            printArea.innerHTML = wrapper.innerHTML;
+            printArea.classList.remove('hidden');
+            
+            window.print();
+            
+            setTimeout(() => {
+                printArea.classList.add('hidden');
+                printArea.innerHTML = '';
+                loadTimetable();
+            }, 1000);
         };
 
-        // START
-        initApp();
+        // --- DASHBOARD STATS ---
+        window.loadDashboardStats = async () => {
+            const sSnap = await getDocs(collection(db, 'students'));
+            document.getElementById('dash-total-students').textContent = sSnap.size;
+        };
 
     </script>
 </body>
