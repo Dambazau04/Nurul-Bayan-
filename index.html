@@ -121,22 +121,10 @@
             .no-print-break { break-inside: avoid; }
         }
 
-        /* Stamp Style */
-        .school-stamp {
-            border: 3px double var(--primary);
-            border-radius: 50%;
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: var(--primary);
-            font-weight: bold;
-            font-size: 10px;
-            transform: rotate(-15deg);
-            opacity: 0.8;
-            mask-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='); /* Simple noise mask */
+        /* Old Stamp class kept for legacy reference, but replaced by SVG in JS */
+        .school-stamp-container {
+            display: inline-block;
+            position: relative;
         }
     </style>
 </head>
@@ -517,6 +505,53 @@
             receipts: [],
             timetable: {}
         };
+
+        // --- NEW SVG STAMP GENERATOR ---
+        window.getStampSVG = (type, date) => {
+            const color = type === 'PAID' ? '#d93025' : '#047857'; // Red for PAID, Green for Official
+            const id = Math.random().toString(36).substr(2, 9); // Unique ID for paths
+
+            return `
+            <div style="position: relative; display: inline-block; width: 120px; height: 120px; transform: rotate(-15deg); opacity: 0.9;">
+                <svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                    <style>
+                        .st-text-${id} { font-family: 'Courier New', monospace; font-weight: bold; fill: ${color}; text-transform: uppercase; }
+                        .st-border-${id} { fill: none; stroke: ${color}; }
+                    </style>
+                    
+                    <!-- Outer/Inner Rings -->
+                    <circle cx="60" cy="60" r="56" class="st-border-${id}" stroke-width="2" />
+                    <circle cx="60" cy="60" r="48" class="st-border-${id}" stroke-width="1" stroke-dasharray="2,2"/>
+                    <circle cx="60" cy="60" r="35" class="st-border-${id}" stroke-width="0.5" opacity="0.5"/>
+                    
+                    <!-- Text Paths -->
+                    <defs>
+                        <path id="curveTop${id}" d="M 14,60 A 46,46 0 1,1 106,60" fill="none" />
+                        <path id="curveBot${id}" d="M 14,60 A 46,46 0 0,0 106,60" fill="none" />
+                    </defs>
+                    
+                    <!-- Arced Text -->
+                    <text class="st-text-${id}" font-size="8.5" letter-spacing="1">
+                        <textPath href="#curveTop${id}" startOffset="50%" text-anchor="middle">NURUL BAYAN SCIENCE ACADEMY</textPath>
+                    </text>
+                    <text class="st-text-${id}" font-size="8" letter-spacing="2">
+                        <textPath href="#curveBot${id}" startOffset="50%" text-anchor="middle">KNOWLEDGE IS SUCCESS</textPath>
+                    </text>
+                    
+                    <!-- Center Text -->
+                    <text x="60" y="58" text-anchor="middle" class="st-text-${id}" font-size="14" font-weight="900" style="text-shadow: 1px 1px 0px rgba(255,255,255,0.8);">${type}</text>
+                    <text x="60" y="72" text-anchor="middle" class="st-text-${id}" font-size="9">${date}</text>
+                    
+                     <!-- Stars -->
+                    <text x="12" y="62" class="st-text-${id}" font-size="10" transform="rotate(-90 12 62)">★</text>
+                    <text x="108" y="62" class="st-text-${id}" font-size="10" transform="rotate(90 108 62)">★</text>
+                </svg>
+                
+                <!-- Grunge/Noise Overlay for realism -->
+                <div style="position: absolute; inset: 0; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAIklEQVQIW2NkQAKrVq36zwjjgzjwqUAXYwYJAdmjC6AKAQAqQBFt1h955gAAAABJRU5ErkJggg=='); background-repeat: repeat; opacity: 0.15; pointer-events: none; border-radius: 50%; mix-blend-mode: multiply;"></div>
+            </div>
+            `;
+        }
 
         // INIT
         async function initApp() {
@@ -1021,6 +1056,8 @@
                 else if(average >= 50) pComment = "Good attempt, but needs to work harder next term.";
                 else pComment = "Poor performance. Needs serious attention and improvement.";
 
+                const stampSVG = getStampSVG('OFFICIAL', new Date().toLocaleDateString());
+
                 const cardHTML = `
                     <div class="report-card-page bg-white mx-auto relative text-gray-900 font-serif">
                         <!-- Border container -->
@@ -1091,10 +1128,8 @@
 
                                 <div class="flex justify-between items-center mt-4">
                                     <div class="text-center">
-                                        <div class="school-stamp mb-1 mx-auto text-[8px] leading-tight flex flex-col justify-center">
-                                            <span>NURUL BAYAN</span>
-                                            <span>SCIENCE ACADEMY</span>
-                                            <span class="text-red-600 text-xs mt-1">OFFICIAL</span>
+                                        <div class="mb-1 mx-auto flex justify-center">
+                                           ${stampSVG}
                                         </div>
                                         <p class="text-[10px] font-bold">Principal's Signature</p>
                                     </div>
@@ -1223,6 +1258,8 @@
 
         window.printReceipt = (r) => {
              const printArea = document.getElementById('print-area');
+             const stampSVG = getStampSVG('PAID', r.date);
+
              const receiptHTML = `
                 <div class="receipt-page bg-white p-8 border-2 border-gray-800 font-serif relative overflow-hidden">
                      <!-- Watermark -->
@@ -1266,8 +1303,8 @@
                              <div class="border-b border-gray-800 mb-1"></div>
                              <p class="text-xs">Accountant Sig</p>
                         </div>
-                         <div class="school-stamp">
-                             PAID<br>${r.date}
+                         <div>
+                             ${stampSVG}
                         </div>
                         <div class="text-center w-32">
                              <div class="border-b border-gray-800 mb-1">Manager</div>
