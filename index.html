@@ -5,19 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nurul Bayan Science Academy - Management System</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
-    <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
@@ -41,6 +36,7 @@
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
             background: #f1f1f1; 
@@ -108,6 +104,24 @@
         .tt-input:focus {
             background-color: #fff;
             box-shadow: inset 0 0 0 2px var(--secondary);
+        }
+        /* Editable headers styling */
+        .editable-header {
+            background: transparent;
+            color: white;
+            text-align: center;
+            width: 100%;
+            border: 1px dashed transparent;
+        }
+        .editable-header:hover, .editable-header:focus {
+            border-color: rgba(255,255,255,0.5);
+            background: rgba(255,255,255,0.1);
+        }
+        .editable-row-label {
+            background: transparent;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
         }
 
         /* Loader */
@@ -188,15 +202,18 @@
             .qr-code-img {
                 display: block !important;
             }
+            
+            /* Hide timetable action buttons on print */
+            .tt-action-btn {
+                display: none !important;
+            }
         }
     </style>
 </head>
 <body class="text-gray-800">
 
-    <!-- Notifications -->
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
-    <!-- Login Screen -->
     <div id="login-screen" class="fixed inset-0 z-50 bg-emerald-900 flex items-center justify-center">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:scale-105 duration-300 mx-4">
             <div class="text-center mb-6">
@@ -222,10 +239,8 @@
         </div>
     </div>
 
-    <!-- Dashboard Layout -->
     <div id="app-container" class="hidden flex h-screen overflow-hidden">
         
-        <!-- Sidebar -->
         <aside id="sidebar" class="bg-emerald-900 text-white w-64 flex-shrink-0 hidden md:flex flex-col transition-all duration-300">
             <div class="p-6 border-b border-emerald-800 flex flex-col items-center">
                 <i class="fas fa-school text-4xl text-amber-400 mb-2"></i>
@@ -247,9 +262,7 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
-            <!-- Header -->
             <header class="bg-white shadow-sm z-20 flex items-center justify-between px-6 py-3 no-print">
                 <button id="menu-toggle" class="md:hidden text-emerald-800 text-2xl"><i class="fas fa-bars"></i></button>
                 <div class="font-semibold text-gray-700">
@@ -266,10 +279,8 @@
                 </div>
             </header>
 
-            <!-- Views -->
             <div id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
                 
-                <!-- 1. DASHBOARD -->
                 <div id="view-dashboard" class="view-section animate-fade-in">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Overview</h2>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -312,7 +323,6 @@
                     </div>
                 </div>
 
-                <!-- 2. STUDENTS -->
                 <div id="view-students" class="view-section hidden">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Student Management</h2>
@@ -343,7 +353,6 @@
                     </div>
                 </div>
 
-                <!-- 3. SUBJECTS -->
                 <div id="view-subjects" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Subject Allocation</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -370,9 +379,8 @@
                     </div>
                 </div>
 
-                <!-- 4. MARKS -->
                 <div id="view-marks" class="view-section hidden">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Marks Entry</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Marks Entry (CA: 40, Exam: 60)</h2>
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
@@ -397,9 +405,8 @@
                                 <thead class="bg-gray-100 text-gray-700">
                                     <tr>
                                         <th class="p-3">Student Name</th>
-                                        <th class="p-3 w-24">CA1 (20)</th>
-                                        <th class="p-3 w-24">CA2 (20)</th>
-                                        <th class="p-3 w-24">Exam (60)</th>
+                                        <th class="p-3 min-w-[120px]">CA (40)</th>
+                                        <th class="p-3 min-w-[120px]">Exam (60)</th>
                                         <th class="p-3 w-24">Total</th>
                                         <th class="p-3 w-24">Grade</th>
                                     </tr>
@@ -414,7 +421,6 @@
                     </div>
                 </div>
 
-                <!-- 5. REPORTS -->
                 <div id="view-reports" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Report Cards</h2>
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6 no-print">
@@ -451,7 +457,7 @@
                             <table class="w-full text-sm text-left min-w-[500px]">
                                 <thead class="bg-gray-100">
                                     <tr>
-                                        <th class="p-2">Pos</th>
+                                        <th class="p-2">Grade/Class</th>
                                         <th class="p-2">Student</th>
                                         <th class="p-2">Avg</th>
                                         <th class="p-2">Action</th>
@@ -463,11 +469,9 @@
                     </div>
                 </div>
 
-                <!-- 6. FINANCE -->
                 <div id="view-finance" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Receipt Management</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
-                        <!-- New Receipt Form -->
                         <div class="bg-white p-6 rounded-xl shadow-sm">
                             <h3 class="font-bold text-lg mb-4 text-emerald-800">New Receipt</h3>
                             <form id="receipt-form" class="space-y-3">
@@ -495,7 +499,6 @@
                             </form>
                         </div>
 
-                        <!-- History & Validation -->
                         <div class="lg:col-span-2 space-y-6">
                             <div class="bg-white p-6 rounded-xl shadow-sm">
                                 <h3 class="font-bold text-lg mb-4 text-gray-700">Validate Receipt</h3>
@@ -526,7 +529,6 @@
                     </div>
                 </div>
 
-                <!-- 7. TIMETABLE -->
                 <div id="view-timetable" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Class Timetables</h2>
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6 no-print">
@@ -538,13 +540,24 @@
                             <button onclick="loadTimetable()" class="bg-blue-600 text-white px-6 py-2 rounded">Load</button>
                             <button onclick="printTimetable()" class="bg-gray-800 text-white px-6 py-2 rounded"><i class="fas fa-print"></i> Print</button>
                         </div>
+                        <div class="mt-4 text-sm text-gray-500">
+                            <i class="fas fa-info-circle"></i> Note: Click on Days or Time slots to rename them.
+                        </div>
                     </div>
                     
                     <div id="timetable-container" class="bg-white rounded-xl shadow-sm p-4 overflow-x-auto">
                         <div id="timetable-print-wrapper" class="min-w-[800px] md:min-w-0">
-                            <!-- Injected Table -->
+                            </div>
+                        
+                        <div class="mt-4 flex flex-wrap gap-2 no-print">
+                             <button onclick="addTimetableColumn()" class="bg-amber-100 text-amber-800 px-4 py-2 rounded text-sm font-bold hover:bg-amber-200"><i class="fas fa-plus mr-1"></i> Add Period (Column)</button>
+                             <button onclick="addTimetableRow()" class="bg-amber-100 text-amber-800 px-4 py-2 rounded text-sm font-bold hover:bg-amber-200"><i class="fas fa-plus mr-1"></i> Add Day (Row)</button>
+                             <button onclick="removeLastColumn()" class="bg-red-100 text-red-800 px-4 py-2 rounded text-sm font-bold hover:bg-red-200"><i class="fas fa-trash mr-1"></i> Del Last Col</button>
+                             <button onclick="removeLastRow()" class="bg-red-100 text-red-800 px-4 py-2 rounded text-sm font-bold hover:bg-red-200"><i class="fas fa-trash mr-1"></i> Del Last Row</button>
+                             <div class="flex-grow text-right">
+                                 <button onclick="saveTimetable()" class="bg-emerald-600 text-white px-6 py-2 rounded shadow-lg hover:bg-emerald-700">Save Timetable</button>
+                             </div>
                         </div>
-                        <button onclick="saveTimetable()" class="mt-4 bg-emerald-600 text-white px-6 py-2 rounded no-print">Save Timetable</button>
                     </div>
                 </div>
 
@@ -552,11 +565,8 @@
         </main>
     </div>
 
-    <!-- DEDICATED GLOBAL PRINT CONTAINER -->
-    <!-- This is the ONLY thing that will appear when printing -->
     <div id="global-print-container" class="hidden"></div>
 
-    <!-- ADD STUDENT MODAL -->
     <div id="add-student-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 m-4">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Student</h3>
@@ -582,7 +592,6 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -832,7 +841,7 @@
             }
         };
 
-        // --- MARKS ---
+        // --- MARKS (UPDATED LOGIC: CA 40, EXAM 60) ---
         window.loadSubjectsForMarks = async () => {
             const cls = document.getElementById('marks-class').value;
             const subSel = document.getElementById('marks-subject');
@@ -866,15 +875,17 @@
             tbody.innerHTML = '';
             studentsSnap.forEach(s => {
                 const std = s.data();
-                const m = marksMap[s.id] || { ca1:0, ca2:0, exam:0 };
-                const total = (Number(m.ca1)+Number(m.ca2)+Number(m.exam));
+                const m = marksMap[s.id] || { ca:0, exam:0 };
+                // Handle legacy data where CA1/CA2 might exist
+                const caScore = m.ca || (m.ca1 || 0) + (m.ca2 || 0); 
+                const total = (Number(caScore)+Number(m.exam));
                 
+                // WIDER INPUTS ADDED HERE
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr data-sid="${s.id}" data-docid="${m.docId || ''}">
                         <td class="p-3 font-medium">${std.name}</td>
-                        <td class="p-1"><input type="number" max="20" class="w-full border p-1 rounded mark-input" name="ca1" value="${m.ca1}"></td>
-                        <td class="p-1"><input type="number" max="20" class="w-full border p-1 rounded mark-input" name="ca2" value="${m.ca2}"></td>
-                        <td class="p-1"><input type="number" max="60" class="w-full border p-1 rounded mark-input" name="exam" value="${m.exam}"></td>
+                        <td class="p-1"><input type="number" max="40" class="w-full min-w-[100px] border p-1 rounded mark-input" name="ca" value="${caScore}"></td>
+                        <td class="p-1"><input type="number" max="60" class="w-full min-w-[100px] border p-1 rounded mark-input" name="exam" value="${m.exam}"></td>
                         <td class="p-3 font-bold text-center total-cell">${total}</td>
                         <td class="p-3 text-center grade-cell">${calculateGrade(total)}</td>
                     </tr>
@@ -890,10 +901,9 @@
 
         function updateRowTotal(e) {
             const row = e.target.closest('tr');
-            const ca1 = Number(row.querySelector('[name="ca1"]').value) || 0;
-            const ca2 = Number(row.querySelector('[name="ca2"]').value) || 0;
+            const ca = Number(row.querySelector('[name="ca"]').value) || 0;
             const exam = Number(row.querySelector('[name="exam"]').value) || 0;
-            const total = ca1 + ca2 + exam;
+            const total = ca + exam;
             row.querySelector('.total-cell').textContent = total;
             row.querySelector('.grade-cell').textContent = calculateGrade(total);
         }
@@ -916,16 +926,15 @@
             rows.forEach(row => {
                 const sid = row.dataset.sid;
                 const docId = row.dataset.docid;
-                const ca1 = Number(row.querySelector('[name="ca1"]').value);
-                const ca2 = Number(row.querySelector('[name="ca2"]').value);
+                const ca = Number(row.querySelector('[name="ca"]').value);
                 const exam = Number(row.querySelector('[name="exam"]').value);
-                const total = ca1 + ca2 + exam;
+                const total = ca + exam;
 
                 const data = {
                     studentId: sid,
                     class: cls,
                     subject: sub,
-                    ca1, ca2, exam, total,
+                    ca, exam, total,
                     session: '2025/2026',
                     term: '1st' 
                 };
@@ -1010,7 +1019,7 @@
             processed.forEach(p => {
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr class="border-b">
-                        <td class="p-2 font-bold">${p.positionDisplay}</td>
+                        <td class="p-2 font-bold text-emerald-700">${p.positionDisplay}</td>
                         <td class="p-2">${p.student.name}</td>
                         <td class="p-2 font-mono">${p.average}</td>
                         <td class="p-2">
@@ -1023,13 +1032,13 @@
         
         function getCustomPositionTier(avg) {
              const score = parseFloat(avg);
-             if (score >= 90) return "1A";
-             if (score >= 80) return "1B";
-             if (score >= 70) return "2A";
-             if (score >= 60) return "2B";
-             if (score >= 50) return "3A";
-             if (score >= 40) return "3B";
-             return "4th";
+             if (score >= 90) return "1A (Distinction)";
+             if (score >= 80) return "1B (Excellence)";
+             if (score >= 70) return "2A (Merit)";
+             if (score >= 60) return "2B (Credit)";
+             if (score >= 50) return "3A (Pass)";
+             if (score >= 40) return "3B (Fair)";
+             return "Fail";
         }
 
         // --- BULK PRINTING FUNCTIONALITY ---
@@ -1118,11 +1127,11 @@
             else if(data.average >= 60) comment = "A good performance, but there is room for improvement.";
             else comment = "More effort is required next term.";
 
+            // Updated Subject Row for single CA (40) and Exam (60)
             let subjectsRows = data.marks.map(m => `
                 <tr>
                     <td class="p-1 pl-2 border border-emerald-900">${m.subject}</td>
-                    <td class="p-1 text-center border border-emerald-900">${m.ca1}</td>
-                    <td class="p-1 text-center border border-emerald-900">${m.ca2}</td>
+                    <td class="p-1 text-center border border-emerald-900">${m.ca || 0}</td>
                     <td class="p-1 text-center border border-emerald-900">${m.exam}</td>
                     <td class="p-1 text-center border border-emerald-900 font-bold">${m.total}</td>
                     <td class="p-1 text-center border border-emerald-900 font-bold ${getGradeColor(calculateGrade(m.total))}">${calculateGrade(m.total)}</td>
@@ -1133,12 +1142,10 @@
                 <div class="h-full w-full border-4 border-emerald-800 p-1 bg-white relative text-gray-800 flex flex-col">
                     <div class="h-full border-2 border-amber-500 p-4 relative flex flex-col flex-grow">
                         
-                        <!-- Watermark -->
                         <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
                             <i class="fas fa-book-quran text-[400px]"></i>
                         </div>
 
-                        <!-- Header -->
                         <div class="flex justify-between items-center border-b-2 border-emerald-800 pb-2 mb-2 flex-shrink-0">
                             <div class="w-24 text-center">
                                 <div class="text-4xl text-emerald-800"><i class="fas fa-book-open"></i></div>
@@ -1155,7 +1162,6 @@
                             </div>
                         </div>
 
-                        <!-- Student Info Grid -->
                         <div class="bg-emerald-50 border border-emerald-200 p-2 mb-2 flex-shrink-0">
                             <div class="grid grid-cols-3 gap-2 text-sm">
                                 <div><span class="font-bold text-emerald-800">Name:</span> <span class="uppercase">${data.student.name}</span></div>
@@ -1163,21 +1169,19 @@
                                 <div><span class="font-bold text-emerald-800">Session:</span> ${session}</div>
                                 <div><span class="font-bold text-emerald-800">Term:</span> ${term}</div>
                                 <div><span class="font-bold text-emerald-800">No. in Class:</span> ${currentClassReportData.length}</div>
-                                <div><span class="font-bold text-emerald-800">Position:</span> <span class="text-red-600 font-bold border border-red-600 px-1 rounded bg-white">${data.positionDisplay}</span></div>
+                                <div><span class="font-bold text-emerald-800">Class of Result:</span> <span class="text-red-600 font-bold border border-red-600 px-1 rounded bg-white">${data.positionDisplay}</span></div>
                             </div>
                         </div>
 
-                        <!-- Marks Table -->
                         <div class="flex-grow flex flex-col mb-2">
                             <table class="w-full text-sm border-collapse">
                                 <thead>
                                     <tr class="bg-emerald-800 text-white">
                                         <th class="p-1 border border-emerald-900 text-left pl-2">Subject</th>
-                                        <th class="p-1 border border-emerald-900 w-12">CA1</th>
-                                        <th class="p-1 border border-emerald-900 w-12">CA2</th>
-                                        <th class="p-1 border border-emerald-900 w-12">Exam</th>
-                                        <th class="p-1 border border-emerald-900 w-12">Total</th>
-                                        <th class="p-1 border border-emerald-900 w-12">Grade</th>
+                                        <th class="p-1 border border-emerald-900 w-16">CA (40)</th>
+                                        <th class="p-1 border border-emerald-900 w-16">Exam (60)</th>
+                                        <th class="p-1 border border-emerald-900 w-16">Total</th>
+                                        <th class="p-1 border border-emerald-900 w-16">Grade</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1186,7 +1190,6 @@
                             </table>
                         </div>
 
-                        <!-- Summary -->
                         <div class="flex gap-4 mb-2 flex-shrink-0">
                             <div class="w-2/3 border border-emerald-800 p-2">
                                 <div class="flex justify-between mb-2 border-b border-gray-200 pb-1">
@@ -1212,7 +1215,6 @@
                             </div>
                         </div>
 
-                        <!-- Footer -->
                         <div class="flex-shrink-0">
                             <div class="flex justify-between items-end mb-2">
                                 <div class="text-center w-1/3">
@@ -1261,7 +1263,7 @@
              const ws = XLSX.utils.json_to_sheet(currentClassReportData.map(d => ({
                  Name: d.student.name,
                  Average: d.average,
-                 Position: d.positionDisplay
+                 ClassResult: d.positionDisplay
              })));
              const wb = XLSX.utils.book_new();
              XLSX.utils.book_append_sheet(wb, ws, "Report");
@@ -1410,9 +1412,10 @@
             }, 300);
         }
 
-        // --- TIMETABLE ---
-        const periods = ['8:00-8:40', '8:40-9:20', '9:20-10:00', 'Break', '10:30-11:10', '11:10-11:50', '11:50-12:30'];
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+        // --- TIMETABLE (REWRITTEN: DYNAMIC & EDITABLE) ---
+        // Defaults if no data exists
+        const defaultHeaders = ['8:00-8:40', '8:40-9:20', '9:20-10:00', 'Break', '10:30-11:10', '11:10-11:50', '11:50-12:30'];
+        const defaultRows = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
         window.loadTimetable = async () => {
             const cls = document.getElementById('timetable-class').value;
@@ -1420,14 +1423,36 @@
             
             const q = query(collection(db, 'timetable'), where('class', '==', cls));
             const snap = await getDocs(q);
-            let savedData = {};
-            if(!snap.empty) {
-                savedData = JSON.parse(snap.docs[0].data().json);
-                wrapper.dataset.docId = snap.docs[0].id;
-            } else {
-                wrapper.dataset.docId = '';
-            }
+            
+            let tData = { 
+                headers: [...defaultHeaders], 
+                rows: [...defaultRows], 
+                values: {} 
+            };
+            let docId = '';
 
+            if(!snap.empty) {
+                docId = snap.docs[0].id;
+                const raw = snap.docs[0].data();
+                try {
+                    const parsed = JSON.parse(raw.json);
+                    // Check if it's the new format (has 'headers') or old format
+                    if(parsed.headers) {
+                        tData = parsed;
+                    } else {
+                        // Legacy support: use default headers/rows but keep values
+                        tData.values = parsed;
+                    }
+                } catch(e) { console.error("Error parsing timetable", e); }
+            }
+            wrapper.dataset.docId = docId;
+
+            renderTimetable(tData);
+        };
+
+        function renderTimetable(tData) {
+            const wrapper = document.getElementById('timetable-print-wrapper');
+            
             let html = `
                 <div class="print-container">
                     <div class="text-center mb-6">
@@ -1435,34 +1460,41 @@
                              <div class="text-4xl text-emerald-800"><i class="fas fa-book-open"></i></div>
                              <div class="text-center">
                                 <h1 class="text-2xl font-bold uppercase text-emerald-800">Nurul Bayan Science Academy</h1>
-                                <div class="bg-amber-500 text-white px-4 py-1 inline-block rounded-full font-bold mt-1 shadow-sm">CLASS TIMETABLE: ${cls}</div>
+                                <div class="bg-amber-500 text-white px-4 py-1 inline-block rounded-full font-bold mt-1 shadow-sm">CLASS TIMETABLE: ${document.getElementById('timetable-class').value}</div>
                              </div>
                              <div class="text-4xl text-emerald-800"><i class="fas fa-graduation-cap"></i></div>
                          </div>
                     </div>
-                    <table class="w-full border-2 border-emerald-800 text-sm text-center shadow-lg rounded-lg overflow-hidden">
+                    <table class="w-full border-2 border-emerald-800 text-sm text-center shadow-lg rounded-lg overflow-hidden" id="timetable-table">
                         <thead>
                             <tr class="tt-header">
                                 <th class="p-3 border border-white/20">Day/Time</th>
-                                ${periods.map(p => `<th class="p-3 border border-white/20">${p}</th>`).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
             `;
 
-            days.forEach((day, index) => {
-                const bgRow = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
-                html += `<tr class="${bgRow}"><td class="border border-emerald-200 font-bold bg-emerald-100 text-emerald-900 p-2">${day}</td>`;
-                periods.forEach((p, idx) => {
-                    const key = `${day}-${idx}`;
-                    const val = savedData[key] || '';
-                    if(p === 'Break') {
-                        html += `<td class="border border-emerald-200 bg-amber-100 font-bold text-amber-800 text-xs tracking-widest relative">
-                                    <div class="absolute inset-0 flex items-center justify-center -rotate-45 opacity-50">BREAK</div>
-                                 </td>`;
-                    } else {
-                        html += `<td class="border border-emerald-200 p-0 tt-cell"><input type="text" class="tt-input w-full h-full text-center p-2 outline-none bg-transparent font-medium text-gray-700 placeholder-gray-300" data-key="${key}" value="${val}" placeholder="..."></td>`;
-                    }
+            // Render Editable Headers
+            tData.headers.forEach((h, idx) => {
+                html += `<th class="p-3 border border-white/20 min-w-[80px]">
+                            <input type="text" value="${h}" class="editable-header tt-header-input" data-idx="${idx}">
+                         </th>`;
+            });
+            html += `</tr></thead><tbody>`;
+
+            // Render Rows
+            tData.rows.forEach((rowLabel, rIdx) => {
+                const bgRow = rIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                html += `<tr class="${bgRow}">
+                            <td class="border border-emerald-200 font-bold bg-emerald-100 text-emerald-900 p-2 min-w-[100px]">
+                                <input type="text" value="${rowLabel}" class="editable-row-label tt-row-input" data-ridx="${rIdx}">
+                            </td>`;
+                
+                tData.headers.forEach((h, cIdx) => {
+                    const key = `${rIdx}-${cIdx}`; // New Key format based on indices
+                    // Legacy key fallback check (Day-Index) - simpler to just reset for dynamic grid
+                    const val = tData.values[key] || '';
+                    
+                    html += `<td class="border border-emerald-200 p-0 tt-cell">
+                                <input type="text" class="tt-input w-full h-full text-center p-2 outline-none bg-transparent font-medium text-gray-700 placeholder-gray-300" data-key="${key}" value="${val}" placeholder="...">
+                             </td>`;
                 });
                 html += `</tr>`;
             });
@@ -1471,13 +1503,50 @@
                 <div class="mt-4 text-center text-xs text-gray-500 font-bold uppercase">Effective from: 2025/2026 Session</div>
             </div>`;
             wrapper.innerHTML = html;
+        }
+
+        // Dynamic Timetable Functions
+        window.addTimetableColumn = () => {
+            const data = scrapeTimetableData();
+            data.headers.push("New Period");
+            renderTimetable(data);
         };
+
+        window.addTimetableRow = () => {
+            const data = scrapeTimetableData();
+            data.rows.push("New Day");
+            renderTimetable(data);
+        };
+        
+        window.removeLastColumn = () => {
+             const data = scrapeTimetableData();
+             if(data.headers.length > 1) {
+                 data.headers.pop();
+                 renderTimetable(data);
+             }
+        };
+
+        window.removeLastRow = () => {
+             const data = scrapeTimetableData();
+             if(data.rows.length > 1) {
+                 data.rows.pop();
+                 renderTimetable(data);
+             }
+        };
+
+        function scrapeTimetableData() {
+            const headers = Array.from(document.querySelectorAll('.tt-header-input')).map(i => i.value);
+            const rows = Array.from(document.querySelectorAll('.tt-row-input')).map(i => i.value);
+            const values = {};
+            document.querySelectorAll('.tt-input').forEach(inp => {
+                values[inp.dataset.key] = inp.value;
+            });
+            return { headers, rows, values };
+        }
 
         window.saveTimetable = async () => {
             const cls = document.getElementById('timetable-class').value;
-            const inputs = document.querySelectorAll('.tt-input');
-            const data = {};
-            inputs.forEach(inp => data[inp.dataset.key] = inp.value);
+            const data = scrapeTimetableData();
             
             const wrapper = document.getElementById('timetable-print-wrapper');
             const docId = wrapper.dataset.docId;
@@ -1491,14 +1560,33 @@
         };
 
         window.printTimetable = () => {
-            const inputs = document.querySelectorAll('.tt-input');
-            inputs.forEach(i => {
-                i.parentElement.innerHTML = `<div class="p-2 font-bold text-gray-800 text-center">${i.value}</div>`;
-            });
+            // Temporarily replace inputs with text for printing
+            const container = document.getElementById('timetable-print-wrapper').cloneNode(true);
             
-            const wrapper = document.getElementById('timetable-print-wrapper');
+            // Replace header inputs
+            container.querySelectorAll('.tt-header-input').forEach(inp => {
+                const span = document.createElement('span');
+                span.textContent = inp.value;
+                inp.replaceWith(span);
+            });
+            // Replace row inputs
+            container.querySelectorAll('.tt-row-input').forEach(inp => {
+                const span = document.createElement('span');
+                span.textContent = inp.value;
+                inp.replaceWith(span);
+            });
+            // Replace cell inputs
+            container.querySelectorAll('.tt-input').forEach(inp => {
+                const div = document.createElement('div');
+                div.className = "p-2 font-bold text-gray-800 text-center";
+                div.textContent = inp.value;
+                inp.parentElement.appendChild(div);
+                inp.remove();
+            });
+
             const printArea = document.getElementById('global-print-container');
-            printArea.innerHTML = wrapper.innerHTML;
+            printArea.innerHTML = '';
+            printArea.appendChild(container);
             printArea.classList.remove('hidden');
             
             window.print();
@@ -1506,7 +1594,6 @@
             setTimeout(() => {
                 printArea.classList.add('hidden');
                 printArea.innerHTML = '';
-                loadTimetable();
             }, 1000);
         };
 
