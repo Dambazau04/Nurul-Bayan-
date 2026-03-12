@@ -268,7 +268,7 @@
             <header class="bg-white shadow-sm z-20 flex items-center justify-between px-6 py-3 no-print">
                 <button id="menu-toggle" class="md:hidden text-emerald-800 text-2xl"><i class="fas fa-bars"></i></button>
                 <div class="font-semibold text-gray-700">
-                    Session: <span id="current-session-display" class="text-emerald-700">2025/2026</span>
+                    Session: <span id="current-session-display" class="text-emerald-700"></span> | Term: <span id="current-term-display" class="text-amber-600"></span>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="text-right hidden sm:block">
@@ -330,7 +330,10 @@
                 <div id="view-students" class="view-section hidden">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Student Management</h2>
-                        <button onclick="openModal('add-student-modal')" class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 shadow-md transition"><i class="fas fa-plus mr-2"></i> Add Student</button>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('promote-students-modal')" class="bg-amber-600 text-white px-5 py-2 rounded-lg hover:bg-amber-700 shadow-md transition"><i class="fas fa-arrow-right mr-2"></i> Promote Students</button>
+                            <button onclick="openModal('add-student-modal')" class="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 shadow-md transition"><i class="fas fa-plus mr-2"></i> Add Student</button>
+                        </div>
                     </div>
 
                     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -636,6 +639,23 @@
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Settings</h2>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Current Session & Term (Global) -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 text-emerald-800">Current Session & Term</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-600">Active Session</label>
+                                    <select id="global-session" class="w-full border p-2 rounded mt-1"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-600">Active Term</label>
+                                    <select id="global-term" class="w-full border p-2 rounded mt-1"></select>
+                                </div>
+                                <button onclick="saveGlobalSessionTerm()" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">Set as Active</button>
+                                <p class="text-xs text-gray-500">This will be the default selection across all modules.</p>
+                            </div>
+                        </div>
+
                         <!-- Class Management -->
                         <div class="bg-white p-6 rounded-xl shadow-sm">
                             <h3 class="font-bold text-lg mb-4 text-emerald-800">Manage Classes</h3>
@@ -649,7 +669,7 @@
                         </div>
 
                         <!-- Session & Term Management -->
-                        <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <div class="bg-white p-6 rounded-xl shadow-sm lg:col-span-2">
                             <h3 class="font-bold text-lg mb-4 text-emerald-800">Manage Sessions & Terms</h3>
                             <form id="add-session-form" class="flex gap-2 mb-4">
                                 <input type="text" id="new-session-name" placeholder="e.g. 2026/2027" class="flex-1 border p-2 rounded" required>
@@ -668,6 +688,7 @@
 
     <div id="global-print-container" class="hidden"></div>
 
+    <!-- Add Student Modal -->
     <div id="add-student-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 m-4">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Student</h3>
@@ -693,6 +714,41 @@
         </div>
     </div>
 
+    <!-- Promote Students Modal -->
+    <div id="promote-students-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 m-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Promote Students</h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">From Class</label>
+                        <select id="promote-from-class" class="w-full border p-2 rounded mt-1" onchange="loadPromoteStudents()"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">To Class</label>
+                        <select id="promote-to-class" class="w-full border p-2 rounded mt-1"></select>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium text-gray-700">Select Students to Promote</span>
+                    <div class="space-x-2">
+                        <button type="button" onclick="toggleAllPromote(true)" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Select All</button>
+                        <button type="button" onclick="toggleAllPromote(false)" class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">Deselect All</button>
+                    </div>
+                </div>
+                <div class="max-h-64 overflow-y-auto border rounded p-2">
+                    <div id="promote-students-list" class="space-y-2">
+                        <!-- Checkboxes will be loaded here -->
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal('promote-students-modal')" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancel</button>
+                    <button type="button" onclick="promoteStudents()" class="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700">Promote Selected</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
@@ -714,6 +770,8 @@
         // --- GLOBAL VARIABLES ---
         let CLASSES = [];
         let SESSIONS = [];
+        let activeSession = '';
+        let activeTerm = '';
         
         let currentUser = sessionStorage.getItem('user');
         
@@ -767,6 +825,11 @@
             if(viewId === 'finance') loadReceiptHistory();
             if(viewId === 'settings') loadSettingsData();
             if(viewId === 'recyclebin') loadRecycleBin();
+            if(viewId === 'students') {
+                // Refresh student list and class dropdowns for promotion modal
+                loadStudents();
+                populatePromoteClassDropdowns();
+            }
         };
 
         document.getElementById('menu-toggle').addEventListener('click', () => {
@@ -777,11 +840,15 @@
         async function initApp() {
             await loadClasses();
             await loadSessionsAndTerms();
+            await loadActiveSettings();
             populateClassDropdowns();
             populateSessionTermDropdowns();
+            populatePromoteClassDropdowns();
             loadDashboardStats();
             loadStudents();
             loadSubjectsList();
+            // Update header display
+            updateHeaderSessionTerm();
         }
 
         async function loadClasses() {
@@ -812,8 +879,48 @@
             SESSIONS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
 
+        async function loadActiveSettings() {
+            try {
+                const settingsDoc = await getDoc(doc(db, 'settings', 'global'));
+                if (settingsDoc.exists()) {
+                    const data = settingsDoc.data();
+                    activeSession = data.activeSession || (SESSIONS.length > 0 ? SESSIONS[0].name : '');
+                    activeTerm = data.activeTerm || (SESSIONS.length > 0 && SESSIONS[0].terms ? SESSIONS[0].terms[0] : '');
+                } else {
+                    // Set defaults if no settings exist
+                    if (SESSIONS.length > 0) {
+                        activeSession = SESSIONS[0].name;
+                        activeTerm = SESSIONS[0].terms ? SESSIONS[0].terms[0] : '';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading active settings:', error);
+            }
+        }
+
+        async function saveActiveSettings(session, term) {
+            try {
+                await setDoc(doc(db, 'settings', 'global'), {
+                    activeSession: session,
+                    activeTerm: term
+                });
+                activeSession = session;
+                activeTerm = term;
+                updateHeaderSessionTerm();
+                showToast('Active session/term saved');
+            } catch (error) {
+                console.error('Error saving active settings:', error);
+                showToast('Failed to save active settings', 'error');
+            }
+        }
+
+        function updateHeaderSessionTerm() {
+            document.getElementById('current-session-display').textContent = activeSession || 'N/A';
+            document.getElementById('current-term-display').textContent = activeTerm || 'N/A';
+        }
+
         function populateClassDropdowns() {
-            const ids = ['new-std-class', 'filter-class-student', 'subject-class', 'marks-class', 'report-class', 'receipt-class', 'timetable-class'];
+            const ids = ['new-std-class', 'filter-class-student', 'subject-class', 'marks-class', 'report-class', 'receipt-class', 'timetable-class', 'promote-from-class', 'promote-to-class'];
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
@@ -837,52 +944,88 @@
             const receiptSession = document.getElementById('receipt-session');
             const ttSession = document.getElementById('timetable-session');
             const ttTerm = document.getElementById('timetable-term');
+            const globalSession = document.getElementById('global-session');
+            const globalTerm = document.getElementById('global-term');
 
-            const sessionSelects = [marksSession, reportSession, receiptSession, ttSession];
-            const termSelects = [marksTerm, reportTerm, ttTerm];
+            const sessionSelects = [marksSession, reportSession, receiptSession, ttSession, globalSession];
+            const termSelects = [marksTerm, reportTerm, ttTerm, globalTerm];
 
-            SESSIONS.forEach(s => {
-                sessionSelects.forEach(sel => {
-                    if (sel) {
+            // Clear and populate sessions
+            sessionSelects.forEach(sel => {
+                if (sel) {
+                    sel.innerHTML = '';
+                    SESSIONS.forEach(s => {
                         const opt = document.createElement('option');
                         opt.value = s.name;
                         opt.textContent = s.name;
                         sel.appendChild(opt);
-                    }
-                });
+                    });
+                }
             });
 
-            if (SESSIONS.length > 0) {
+            // Set active session/term if available
+            if (activeSession) {
+                sessionSelects.forEach(sel => { if (sel) sel.value = activeSession; });
+                updateTermDropdownsForGlobal(activeSession);
+                if (activeTerm) {
+                    termSelects.forEach(sel => { if (sel) sel.value = activeTerm; });
+                }
+            } else if (SESSIONS.length > 0) {
                 sessionSelects.forEach(sel => { if (sel) sel.value = SESSIONS[0].name; });
-                updateTermDropdowns(SESSIONS[0].name);
+                updateTermDropdownsForGlobal(SESSIONS[0].name);
             }
 
-            marksSession?.addEventListener('change', () => updateTermDropdowns(marksSession.value));
-            reportSession?.addEventListener('change', () => updateTermDropdowns(reportSession.value));
-            ttSession?.addEventListener('change', () => updateTermDropdowns(ttSession.value));
+            // Add event listeners for dependent term dropdowns
+            marksSession?.addEventListener('change', () => updateTermDropdowns(marksSession.value, 'marks-term'));
+            reportSession?.addEventListener('change', () => updateTermDropdowns(reportSession.value, 'report-term'));
+            ttSession?.addEventListener('change', () => updateTermDropdowns(ttSession.value, 'timetable-term'));
+            globalSession?.addEventListener('change', () => updateTermDropdowns(globalSession.value, 'global-term'));
         }
 
-        function updateTermDropdowns(sessionName) {
+        function updateTermDropdowns(sessionName, termSelectId) {
             const session = SESSIONS.find(s => s.name === sessionName);
             const terms = session ? session.terms : ['1st Term', '2nd Term', '3rd Term'];
-            
-            const termSelects = [
-                document.getElementById('marks-term'),
-                document.getElementById('report-term'),
-                document.getElementById('timetable-term')
-            ];
-            
-            termSelects.forEach(sel => {
-                if (!sel) return;
-                sel.innerHTML = '';
-                terms.forEach(t => {
-                    const opt = document.createElement('option');
-                    opt.value = t;
-                    opt.textContent = t;
-                    sel.appendChild(opt);
-                });
+            const termSelect = document.getElementById(termSelectId);
+            if (!termSelect) return;
+            termSelect.innerHTML = '';
+            terms.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.textContent = t;
+                termSelect.appendChild(opt);
             });
         }
+
+        function updateTermDropdownsForGlobal(sessionName) {
+            const termSelectIds = ['marks-term', 'report-term', 'timetable-term', 'global-term'];
+            const session = SESSIONS.find(s => s.name === sessionName);
+            const terms = session ? session.terms : ['1st Term', '2nd Term', '3rd Term'];
+            termSelectIds.forEach(id => {
+                const sel = document.getElementById(id);
+                if (sel) {
+                    sel.innerHTML = '';
+                    terms.forEach(t => {
+                        const opt = document.createElement('option');
+                        opt.value = t;
+                        opt.textContent = t;
+                        sel.appendChild(opt);
+                    });
+                }
+            });
+        }
+
+        // --- GLOBAL SESSION/TERM SAVE ---
+        window.saveGlobalSessionTerm = function() {
+            const session = document.getElementById('global-session').value;
+            const term = document.getElementById('global-term').value;
+            if (session && term) {
+                saveActiveSettings(session, term);
+                // Update all dropdowns to match new active
+                populateSessionTermDropdowns();
+            } else {
+                showToast('Please select both session and term', 'error');
+            }
+        };
 
         // --- UTILS ---
         window.showToast = function(msg, type='success') {
@@ -1074,6 +1217,77 @@
                 const text = row.textContent.toLowerCase();
                 row.style.display = text.includes(term) ? '' : 'none';
             });
+        };
+
+        // --- PROMOTE STUDENTS ---
+        function populatePromoteClassDropdowns() {
+            const fromSelect = document.getElementById('promote-from-class');
+            const toSelect = document.getElementById('promote-to-class');
+            if (!fromSelect || !toSelect) return;
+            fromSelect.innerHTML = '';
+            toSelect.innerHTML = '';
+            CLASSES.forEach(c => {
+                const opt1 = document.createElement('option');
+                opt1.value = c;
+                opt1.textContent = c;
+                fromSelect.appendChild(opt1);
+                const opt2 = document.createElement('option');
+                opt2.value = c;
+                opt2.textContent = c;
+                toSelect.appendChild(opt2);
+            });
+        }
+
+        window.loadPromoteStudents = async () => {
+            const fromClass = document.getElementById('promote-from-class').value;
+            const listDiv = document.getElementById('promote-students-list');
+            listDiv.innerHTML = '<div class="text-center p-4">Loading...</div>';
+
+            const q = query(collection(db, 'students'), where('class', '==', fromClass));
+            const snap = await getDocs(q);
+            listDiv.innerHTML = '';
+            if (snap.empty) {
+                listDiv.innerHTML = '<div class="text-center p-4 text-gray-500">No students in this class.</div>';
+                return;
+            }
+            snap.forEach(docSnap => {
+                const student = docSnap.data();
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-2 p-2 hover:bg-gray-50 rounded';
+                div.innerHTML = `
+                    <input type="checkbox" id="promote-${docSnap.id}" value="${docSnap.id}" class="promote-checkbox" checked>
+                    <label for="promote-${docSnap.id}" class="flex-1">${student.name}</label>
+                `;
+                listDiv.appendChild(div);
+            });
+        };
+
+        window.toggleAllPromote = (checked) => {
+            document.querySelectorAll('.promote-checkbox').forEach(cb => cb.checked = checked);
+        };
+
+        window.promoteStudents = async () => {
+            const toClass = document.getElementById('promote-to-class').value;
+            const selected = Array.from(document.querySelectorAll('.promote-checkbox:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                showToast('No students selected', 'error');
+                return;
+            }
+            if (!confirm(`Promote ${selected.length} student(s) to ${toClass}?`)) return;
+
+            try {
+                const promises = selected.map(async (studentId) => {
+                    const studentRef = doc(db, 'students', studentId);
+                    await updateDoc(studentRef, { class: toClass });
+                });
+                await Promise.all(promises);
+                showToast('Students promoted successfully');
+                closeModal('promote-students-modal');
+                loadStudents(); // Refresh student list
+            } catch (error) {
+                console.error('Error promoting students:', error);
+                showToast('Promotion failed', 'error');
+            }
         };
 
         // --- SUBJECTS (modified delete) ---
