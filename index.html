@@ -255,6 +255,8 @@
                     <li><button onclick="nav('reports')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-print w-5"></i> Report Cards</button></li>
                     <li><button onclick="nav('finance')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-receipt w-5"></i> Receipts</button></li>
                     <li><button onclick="nav('timetable')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-calendar-alt w-5"></i> Timetable</button></li>
+                    <li><button onclick="nav('recyclebin')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-trash-restore w-5"></i> Recycle Bin</button></li>
+                    <li><button onclick="nav('settings')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-cog w-5"></i> Settings</button></li>
                 </ul>
             </nav>
             <div class="p-4 border-t border-emerald-800">
@@ -281,6 +283,7 @@
 
             <div id="main-content" class="flex-1 overflow-x-hidden overflow-y-auto p-4 md:p-6">
                 
+                <!-- Dashboard -->
                 <div id="view-dashboard" class="view-section animate-fade-in">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Overview</h2>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
@@ -297,7 +300,7 @@
                             <div class="flex justify-between items-center">
                                 <div>
                                     <p class="text-gray-500 text-sm">Classes</p>
-                                    <h3 class="text-3xl font-bold text-gray-800">10</h3>
+                                    <h3 class="text-3xl font-bold text-gray-800" id="dash-total-classes">0</h3>
                                 </div>
                                 <div class="bg-amber-100 p-3 rounded-full text-amber-600"><i class="fas fa-layer-group"></i></div>
                             </div>
@@ -323,6 +326,7 @@
                     </div>
                 </div>
 
+                <!-- Students -->
                 <div id="view-students" class="view-section hidden">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Student Management</h2>
@@ -353,6 +357,7 @@
                     </div>
                 </div>
 
+                <!-- Subjects -->
                 <div id="view-subjects" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Subject Allocation</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -379,8 +384,22 @@
                     </div>
                 </div>
 
+                <!-- Marks -->
                 <div id="view-marks" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Marks Entry (CA: 40, Exam: 60)</h2>
+                    
+                    <!-- Session & Term Selectors -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Session</label>
+                            <select id="marks-session" class="w-full border p-2 rounded mt-1" onchange="loadSubjectsForMarks()"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Term</label>
+                            <select id="marks-term" class="w-full border p-2 rounded mt-1" onchange="loadSubjectsForMarks()"></select>
+                        </div>
+                    </div>
+
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
@@ -421,21 +440,27 @@
                     </div>
                 </div>
 
+                <!-- Reports -->
                 <div id="view-reports" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Report Cards</h2>
+                    
+                    <!-- Session & Term Selectors -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Session</label>
+                            <select id="report-session" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Term</label>
+                            <select id="report-term" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                    </div>
+
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6 no-print">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                             <div>
                                 <label class="block text-sm font-bold text-gray-600">Class</label>
                                 <select id="report-class" class="w-full border p-2 rounded mt-1"></select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-gray-600">Term</label>
-                                <select id="report-term" class="w-full border p-2 rounded mt-1">
-                                    <option value="1st Term">1st Term</option>
-                                    <option value="2nd Term">2nd Term</option>
-                                    <option value="3rd Term">3rd Term</option>
-                                </select>
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-gray-600">Next Term Begins</label>
@@ -450,7 +475,7 @@
                             <h3 class="font-bold">Class List</h3>
                             <div class="flex gap-2">
                                 <button onclick="exportExcel()" class="bg-green-700 text-white px-3 py-1 rounded text-sm"><i class="fas fa-file-excel mr-1"></i> Excel</button>
-                                <button onclick="printAllReports()" class="bg-purple-700 text-white px-4 py-2 rounded text-sm font-bold shadow-lg hover:bg-purple-800 transition"><i class="fas fa-print mr-1"></i> BULK PRINT CLASS</button>
+                                <button onclick="printAllReports()" class="bg-purple-700 text-white px-4 py-2 rounded text-sm font-bold shadow-lg hover:bg-purple-800 transition"><i class="fas fa-print mr-1"></i> BULK PRINT CLASS (PDF)</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
@@ -469,8 +494,18 @@
                     </div>
                 </div>
 
+                <!-- Finance -->
                 <div id="view-finance" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Receipt Management</h2>
+                    
+                    <!-- Session & Term Selectors -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4 grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Session</label>
+                            <select id="receipt-session" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                    </div>
+
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
                         <div class="bg-white p-6 rounded-xl shadow-sm">
                             <h3 class="font-bold text-lg mb-4 text-emerald-800">New Receipt</h3>
@@ -503,7 +538,7 @@
                             <div class="bg-white p-6 rounded-xl shadow-sm">
                                 <h3 class="font-bold text-lg mb-4 text-gray-700">Validate Receipt</h3>
                                 <div class="flex gap-2">
-                                    <input type="text" id="validate-receipt-no" placeholder="Enter Receipt No (e.g. RCP-1234)" class="flex-1 border p-2 rounded">
+                                    <input type="text" id="validate-receipt-no" placeholder="Enter Receipt No (e.g. NB-1234)" class="flex-1 border p-2 rounded">
                                     <button onclick="validateReceipt()" class="bg-blue-600 text-white px-4 rounded hover:bg-blue-700">Check</button>
                                 </div>
                             </div>
@@ -529,8 +564,22 @@
                     </div>
                 </div>
 
+                <!-- Timetable -->
                 <div id="view-timetable" class="view-section hidden">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Class Timetables</h2>
+                    
+                    <!-- Session & Term Selectors -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Session</label>
+                            <select id="timetable-session" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Term</label>
+                            <select id="timetable-term" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                    </div>
+
                     <div class="bg-white p-6 rounded-xl shadow-sm mb-6 no-print">
                          <div class="flex gap-4 items-end flex-wrap">
                             <div class="flex-1 min-w-[200px]">
@@ -538,7 +587,7 @@
                                 <select id="timetable-class" class="w-full border p-2 rounded mt-1"></select>
                             </div>
                             <button onclick="loadTimetable()" class="bg-blue-600 text-white px-6 py-2 rounded">Load</button>
-                            <button onclick="printTimetable()" class="bg-gray-800 text-white px-6 py-2 rounded"><i class="fas fa-print"></i> Print</button>
+                            <button onclick="printTimetable()" class="bg-gray-800 text-white px-6 py-2 rounded"><i class="fas fa-print"></i> Print (PDF)</button>
                         </div>
                         <div class="mt-4 text-sm text-gray-500">
                             <i class="fas fa-info-circle"></i> Note: Click on Days or Time slots to rename them.
@@ -557,6 +606,58 @@
                              <div class="flex-grow text-right">
                                  <button onclick="saveTimetable()" class="bg-emerald-600 text-white px-6 py-2 rounded shadow-lg hover:bg-emerald-700">Save Timetable</button>
                              </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recycle Bin -->
+                <div id="view-recyclebin" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Recycle Bin</h2>
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-600 uppercase">
+                                    <tr>
+                                        <th class="p-4">Type</th>
+                                        <th class="p-4">Identifier</th>
+                                        <th class="p-4">Deleted On</th>
+                                        <th class="p-4 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recyclebin-tbody" class="divide-y divide-gray-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings (Class & Session/Term Management) -->
+                <div id="view-settings" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Settings</h2>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Class Management -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 text-emerald-800">Manage Classes</h3>
+                            <form id="add-class-form" class="flex gap-2 mb-4">
+                                <input type="text" id="new-class-name" placeholder="e.g. Primary 7" class="flex-1 border p-2 rounded" required>
+                                <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">Add</button>
+                            </form>
+                            <div class="overflow-y-auto max-h-64">
+                                <ul id="class-list" class="space-y-2"></ul>
+                            </div>
+                        </div>
+
+                        <!-- Session & Term Management -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 text-emerald-800">Manage Sessions & Terms</h3>
+                            <form id="add-session-form" class="flex gap-2 mb-4">
+                                <input type="text" id="new-session-name" placeholder="e.g. 2026/2027" class="flex-1 border p-2 rounded" required>
+                                <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">Add Session</button>
+                            </form>
+                            <div id="sessions-list" class="space-y-3">
+                                <!-- Sessions will be listed here with term inputs -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -594,7 +695,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, setDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
         // CONFIG
         const firebaseConfig = {
@@ -611,18 +712,8 @@
         const db = getFirestore(app);
 
         // --- GLOBAL VARIABLES ---
-        const CLASSES = [
-            "Pre-Nursery", "Nursery 1", "Nursery 2", 
-            "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6",
-            "Islamiyya",  ,"حضانة"
-,"الروضة الأولى
-,"الروضة الثانية"
-,"الإبتدائية الأولى"
-,"الإبتدائية الثانية"
-,"الإبتدائية الثالثة"
-,"الإبتدائية الرابعة" 
-"الإبتدائية الخامسة"
-        ];
+        let CLASSES = [];
+        let SESSIONS = [];
         
         let currentUser = sessionStorage.getItem('user');
         
@@ -674,6 +765,8 @@
 
             if(viewId === 'dashboard') loadDashboardStats();
             if(viewId === 'finance') loadReceiptHistory();
+            if(viewId === 'settings') loadSettingsData();
+            if(viewId === 'recyclebin') loadRecycleBin();
         };
 
         document.getElementById('menu-toggle').addEventListener('click', () => {
@@ -681,11 +774,42 @@
         });
 
         // --- INITIALIZATION ---
-        function initApp() {
+        async function initApp() {
+            await loadClasses();
+            await loadSessionsAndTerms();
             populateClassDropdowns();
+            populateSessionTermDropdowns();
             loadDashboardStats();
             loadStudents();
             loadSubjectsList();
+        }
+
+        async function loadClasses() {
+            const snap = await getDocs(collection(db, 'classes'));
+            CLASSES = snap.docs.map(d => d.data().name);
+            if (CLASSES.length === 0) {
+                const defaultClasses = [
+                    "Pre-Nursery", "Nursery 1", "Nursery 2", 
+                    "Primary 1", "Primary 2", "Primary 3", "Primary 4", "Primary 5", "Primary 6",
+                    "Islamiyya"
+                ];
+                for (let cls of defaultClasses) {
+                    await addDoc(collection(db, 'classes'), { name: cls });
+                }
+                CLASSES = defaultClasses;
+            }
+        }
+
+        async function loadSessionsAndTerms() {
+            const sessionsSnap = await getDocs(collection(db, 'sessions'));
+            if (sessionsSnap.empty) {
+                await addDoc(collection(db, 'sessions'), {
+                    name: '2025/2026',
+                    terms: ['1st Term', '2nd Term', '3rd Term']
+                });
+            }
+            const snap = await getDocs(collection(db, 'sessions'));
+            SESSIONS = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         }
 
         function populateClassDropdowns() {
@@ -693,7 +817,7 @@
             ids.forEach(id => {
                 const el = document.getElementById(id);
                 if(!el) return;
-                const hasAll = el.querySelector('option[value="All"]');
+                const hasAll = id === 'filter-class-student' ? true : false;
                 el.innerHTML = hasAll ? '<option value="All">All Classes</option>' : '';
                 
                 CLASSES.forEach(c => {
@@ -701,6 +825,61 @@
                     opt.value = c;
                     opt.textContent = c;
                     el.appendChild(opt);
+                });
+            });
+        }
+
+        function populateSessionTermDropdowns() {
+            const marksSession = document.getElementById('marks-session');
+            const marksTerm = document.getElementById('marks-term');
+            const reportSession = document.getElementById('report-session');
+            const reportTerm = document.getElementById('report-term');
+            const receiptSession = document.getElementById('receipt-session');
+            const ttSession = document.getElementById('timetable-session');
+            const ttTerm = document.getElementById('timetable-term');
+
+            const sessionSelects = [marksSession, reportSession, receiptSession, ttSession];
+            const termSelects = [marksTerm, reportTerm, ttTerm];
+
+            SESSIONS.forEach(s => {
+                sessionSelects.forEach(sel => {
+                    if (sel) {
+                        const opt = document.createElement('option');
+                        opt.value = s.name;
+                        opt.textContent = s.name;
+                        sel.appendChild(opt);
+                    }
+                });
+            });
+
+            if (SESSIONS.length > 0) {
+                sessionSelects.forEach(sel => { if (sel) sel.value = SESSIONS[0].name; });
+                updateTermDropdowns(SESSIONS[0].name);
+            }
+
+            marksSession?.addEventListener('change', () => updateTermDropdowns(marksSession.value));
+            reportSession?.addEventListener('change', () => updateTermDropdowns(reportSession.value));
+            ttSession?.addEventListener('change', () => updateTermDropdowns(ttSession.value));
+        }
+
+        function updateTermDropdowns(sessionName) {
+            const session = SESSIONS.find(s => s.name === sessionName);
+            const terms = session ? session.terms : ['1st Term', '2nd Term', '3rd Term'];
+            
+            const termSelects = [
+                document.getElementById('marks-term'),
+                document.getElementById('report-term'),
+                document.getElementById('timetable-term')
+            ];
+            
+            termSelects.forEach(sel => {
+                if (!sel) return;
+                sel.innerHTML = '';
+                terms.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.textContent = t;
+                    sel.appendChild(opt);
                 });
             });
         }
@@ -738,7 +917,86 @@
             });
         };
 
-        // --- STUDENT MANAGEMENT ---
+        // --- RECYCLE BIN FUNCTIONS ---
+        async function moveToRecycleBin(originalCollection, originalId, data) {
+            try {
+                await addDoc(collection(db, 'recycle_bin'), {
+                    originalCollection,
+                    originalId,
+                    data,
+                    deletedAt: new Date()
+                });
+                showToast('Item moved to recycle bin');
+            } catch (error) {
+                console.error('Error moving to recycle bin:', error);
+                showToast('Failed to move to recycle bin', 'error');
+            }
+        }
+
+        window.restoreFromRecycleBin = async (recycleId) => {
+            try {
+                const recycleDoc = await getDoc(doc(db, 'recycle_bin', recycleId));
+                if (!recycleDoc.exists()) return;
+                const { originalCollection, originalId, data } = recycleDoc.data();
+                // Restore to original collection with original ID
+                await setDoc(doc(db, originalCollection, originalId), data);
+                // Delete from recycle bin
+                await deleteDoc(doc(db, 'recycle_bin', recycleId));
+                showToast('Item restored successfully');
+                loadRecycleBin();
+            } catch (error) {
+                console.error('Error restoring:', error);
+                showToast('Restore failed', 'error');
+            }
+        };
+
+        window.permanentDeleteFromRecycleBin = async (recycleId) => {
+            if (!confirm('Permanently delete this item? This action cannot be undone.')) return;
+            try {
+                await deleteDoc(doc(db, 'recycle_bin', recycleId));
+                showToast('Item permanently deleted');
+                loadRecycleBin();
+            } catch (error) {
+                console.error('Error deleting permanently:', error);
+                showToast('Delete failed', 'error');
+            }
+        };
+
+        window.loadRecycleBin = async () => {
+            const tbody = document.getElementById('recyclebin-tbody');
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4"><div class="loader mx-auto"></div></td></tr>';
+            
+            const snap = await getDocs(collection(db, 'recycle_bin'));
+            tbody.innerHTML = '';
+            
+            snap.forEach(docSnap => {
+                const item = docSnap.data();
+                const deletedDate = item.deletedAt ? new Date(item.deletedAt.seconds * 1000).toLocaleString() : 'Unknown';
+                
+                let identifier = '';
+                if (item.originalCollection === 'students') identifier = item.data.name || 'Unknown';
+                else if (item.originalCollection === 'subjects') identifier = item.data.name || 'Unknown';
+                else if (item.originalCollection === 'receipts') identifier = `${item.data.receiptNo || 'N/A'} - ${item.data.student || ''}`;
+                else if (item.originalCollection === 'classes') identifier = item.data.name || 'Unknown';
+                else if (item.originalCollection === 'sessions') identifier = item.data.name || 'Unknown';
+                else identifier = item.originalId;
+                
+                const row = `
+                    <tr>
+                        <td class="p-4">${item.originalCollection}</td>
+                        <td class="p-4">${identifier}</td>
+                        <td class="p-4">${deletedDate}</td>
+                        <td class="p-4 text-center">
+                            <button onclick="restoreFromRecycleBin('${docSnap.id}')" class="text-emerald-600 hover:text-emerald-800 mr-2"><i class="fas fa-undo"></i> Restore</button>
+                            <button onclick="permanentDeleteFromRecycleBin('${docSnap.id}')" class="text-red-600 hover:text-red-800"><i class="fas fa-trash"></i> Delete Perm</button>
+                        </td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+        };
+
+        // --- STUDENT MANAGEMENT (modified delete) ---
         document.getElementById('create-student-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('new-std-name').value;
@@ -798,10 +1056,14 @@
         };
 
         window.deleteStudent = async (id) => {
-            if(confirm('Are you sure? This will delete all marks for this student too.')) {
-                await deleteDoc(doc(db, 'students', id));
-                loadStudents();
-                showToast('Student deleted');
+            if(confirm('Move student to recycle bin?')) {
+                const docRef = doc(db, 'students', id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    await moveToRecycleBin('students', id, docSnap.data());
+                    await deleteDoc(docRef);
+                    loadStudents();
+                }
             }
         };
 
@@ -814,7 +1076,7 @@
             });
         };
 
-        // --- SUBJECTS ---
+        // --- SUBJECTS (modified delete) ---
         document.getElementById('add-subject-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const cls = document.getElementById('subject-class').value;
@@ -842,13 +1104,18 @@
         };
         
         window.deleteSubject = async (id) => {
-            if(confirm('Delete subject?')) {
-                await deleteDoc(doc(db, 'subjects', id));
-                loadSubjectsList();
+            if(confirm('Move subject to recycle bin?')) {
+                const docRef = doc(db, 'subjects', id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    await moveToRecycleBin('subjects', id, docSnap.data());
+                    await deleteDoc(docRef);
+                    loadSubjectsList();
+                }
             }
         };
 
-        // --- MARKS (UPDATED LOGIC: CA 40, EXAM 60) ---
+        // --- MARKS (unchanged, not recycled) ---
         window.loadSubjectsForMarks = async () => {
             const cls = document.getElementById('marks-class').value;
             const subSel = document.getElementById('marks-subject');
@@ -868,13 +1135,21 @@
         window.loadMarksTable = async () => {
             const cls = document.getElementById('marks-class').value;
             const sub = document.getElementById('marks-subject').value;
+            const session = document.getElementById('marks-session').value;
+            const term = document.getElementById('marks-term').value;
             if(!sub) return showToast('Select a subject', 'error');
 
             const tbody = document.getElementById('marks-tbody');
             tbody.innerHTML = '<tr><td colspan="6" class="text-center p-4">Loading...</td></tr>';
 
             const studentsSnap = await getDocs(query(collection(db, 'students'), where('class', '==', cls)));
-            const marksQ = query(collection(db, 'marks'), where('class', '==', cls), where('subject', '==', sub));
+            const marksQ = query(
+                collection(db, 'marks'), 
+                where('class', '==', cls), 
+                where('subject', '==', sub),
+                where('session', '==', session),
+                where('term', '==', term)
+            );
             const marksSnap = await getDocs(marksQ);
             const marksMap = {};
             marksSnap.forEach(d => marksMap[d.data().studentId] = { ...d.data(), docId: d.id });
@@ -883,11 +1158,9 @@
             studentsSnap.forEach(s => {
                 const std = s.data();
                 const m = marksMap[s.id] || { ca:0, exam:0 };
-                // Handle legacy data where CA1/CA2 might exist
                 const caScore = m.ca || (m.ca1 || 0) + (m.ca2 || 0); 
                 const total = (Number(caScore)+Number(m.exam));
                 
-                // WIDER INPUTS ADDED HERE
                 tbody.insertAdjacentHTML('beforeend', `
                     <tr data-sid="${s.id}" data-docid="${m.docId || ''}">
                         <td class="p-3 font-medium">${std.name}</td>
@@ -927,6 +1200,8 @@
         window.saveMarks = async () => {
             const cls = document.getElementById('marks-class').value;
             const sub = document.getElementById('marks-subject').value;
+            const session = document.getElementById('marks-session').value;
+            const term = document.getElementById('marks-term').value;
             const rows = document.querySelectorAll('#marks-tbody tr');
             const batchPromises = [];
 
@@ -942,8 +1217,8 @@
                     class: cls,
                     subject: sub,
                     ca, exam, total,
-                    session: '2025/2026',
-                    term: '1st' 
+                    session: session,
+                    term: term
                 };
 
                 if(docId) {
@@ -965,9 +1240,11 @@
         window.deleteMarksForSubject = async () => {
              const cls = document.getElementById('marks-class').value;
              const sub = document.getElementById('marks-subject').value;
+             const session = document.getElementById('marks-session').value;
+             const term = document.getElementById('marks-term').value;
              
-             if(confirm(`Delete ALL marks for ${sub} in ${cls}?`)) {
-                 const q = query(collection(db, 'marks'), where('class', '==', cls), where('subject', '==', sub));
+             if(confirm(`Delete ALL marks for ${sub} in ${cls} (${session} ${term})?`)) {
+                 const q = query(collection(db, 'marks'), where('class', '==', cls), where('subject', '==', sub), where('session', '==', session), where('term', '==', term));
                  const snap = await getDocs(q);
                  const promises = snap.docs.map(d => deleteDoc(d.ref));
                  await Promise.all(promises);
@@ -976,12 +1253,13 @@
              }
         };
 
-        // --- REPORT CARDS (Complex Logic) ---
+        // --- REPORT CARDS (improved QR for print) ---
         let currentClassReportData = [];
 
         window.generateReportList = async () => {
             const cls = document.getElementById('report-class').value;
             const term = document.getElementById('report-term').value;
+            const session = document.getElementById('report-session').value;
             
             if(!document.getElementById('next-term-date').value) {
                 showToast('Please set Next Term Date', 'error');
@@ -996,7 +1274,7 @@
             const students = [];
             stdSnap.forEach(d => students.push({ ...d.data(), id: d.id }));
 
-            const marksSnap = await getDocs(query(collection(db, 'marks'), where('class', '==', cls)));
+            const marksSnap = await getDocs(query(collection(db, 'marks'), where('class', '==', cls), where('session', '==', session), where('term', '==', term)));
             const marks = [];
             marksSnap.forEach(d => marks.push(d.data()));
 
@@ -1030,7 +1308,7 @@
                         <td class="p-2">${p.student.name}</td>
                         <td class="p-2 font-mono">${p.average}</td>
                         <td class="p-2">
-                            <button onclick="printReport('${p.student.id}')" class="text-emerald-600 font-bold hover:underline">Print</button>
+                            <button onclick="printReport('${p.student.id}')" class="text-emerald-600 font-bold hover:underline">Print (PDF)</button>
                         </td>
                     </tr>
                 `);
@@ -1048,16 +1326,30 @@
              return "Fail";
         }
 
-        // --- BULK PRINTING FUNCTIONALITY ---
+        // Helper: generate QR code data URL
+        function generateQRDataURL(text) {
+            return new Promise((resolve) => {
+                const qrDiv = document.createElement('div');
+                new QRCode(qrDiv, { text, width: 80, height: 80 });
+                setTimeout(() => {
+                    const canvas = qrDiv.querySelector('canvas');
+                    if (canvas) {
+                        resolve(canvas.toDataURL());
+                    } else {
+                        resolve('');
+                    }
+                }, 100);
+            });
+        }
+
+        // --- BULK PRINTING (fixed) ---
         window.printAllReports = async () => {
              if(currentClassReportData.length === 0) return showToast('Generate list first', 'error');
              
-             // Use the global print container
              const container = document.getElementById('global-print-container');
              container.innerHTML = ''; 
              container.classList.remove('hidden');
 
-             // Generate HTML for ALL students
              for (const data of currentClassReportData) {
                  const reportHTML = await generateReportHTML(data);
                  const wrapper = document.createElement('div');
@@ -1065,25 +1357,15 @@
                  wrapper.innerHTML = reportHTML;
                  container.appendChild(wrapper);
                  
-                 // Generate QR Code
-                 const qrDiv = wrapper.querySelector('.qr-code-placeholder');
                  const qrImg = wrapper.querySelector('.qr-code-img');
                  const verifyUrl = `https://nurul-bayan-academy.web.app/verify?id=${data.student.id}`;
                  
-                 new QRCode(qrDiv, { text: verifyUrl, width: 80, height: 80 });
-                 
-                 // Wait for canvas
-                 await new Promise(r => setTimeout(r, 50)); 
-                 const canvas = qrDiv.querySelector('canvas');
-                 if(canvas) {
-                     qrImg.src = canvas.toDataURL();
-                     qrDiv.style.display = 'none';
-                 }
+                 const qrDataUrl = await generateQRDataURL(verifyUrl);
+                 qrImg.src = qrDataUrl;
              }
 
              window.print();
              
-             // Cleanup after print
              setTimeout(() => {
                  container.classList.add('hidden');
                  container.innerHTML = ''; 
@@ -1104,37 +1386,29 @@
             container.appendChild(wrapper);
             container.classList.remove('hidden');
 
-            const qrDiv = wrapper.querySelector('.qr-code-placeholder');
             const qrImg = wrapper.querySelector('.qr-code-img');
             const verifyUrl = `https://nurul-bayan-academy.web.app/verify?id=${data.student.id}`;
-            
-            new QRCode(qrDiv, { text: verifyUrl, width: 80, height: 80 });
+            const qrDataUrl = await generateQRDataURL(verifyUrl);
+            qrImg.src = qrDataUrl;
+
+            window.print();
             
             setTimeout(() => {
-                const canvas = qrDiv.querySelector('canvas');
-                if(canvas) {
-                    qrImg.src = canvas.toDataURL();
-                    qrDiv.style.display = 'none';
-                }
-                window.print();
-                 setTimeout(() => {
-                     container.classList.add('hidden');
-                     container.innerHTML = '';
-                 }, 1000);
-            }, 300);
+                container.classList.add('hidden');
+                container.innerHTML = '';
+            }, 1000);
         };
 
         async function generateReportHTML(data) {
             const nextTerm = document.getElementById('next-term-date').value;
             const term = document.getElementById('report-term').value;
-            const session = '2025 / 2026';
+            const session = document.getElementById('report-session').value;
 
             let comment = "";
             if(data.average >= 80) comment = "An excellent result. Keep it up!";
             else if(data.average >= 60) comment = "A good performance, but there is room for improvement.";
             else comment = "More effort is required next term.";
 
-            // Updated Subject Row for single CA (40) and Exam (60)
             let subjectsRows = data.marks.map(m => `
                 <tr>
                     <td class="p-1 pl-2 border border-emerald-900">${m.subject}</td>
@@ -1244,7 +1518,6 @@
                                     </div>
                                 </div>
                                 <div class="w-1/3 flex justify-end">
-                                    <div class="qr-code-placeholder mb-1"></div>
                                     <img class="qr-code-img w-20 h-20" />
                                 </div>
                             </div>
@@ -1277,7 +1550,7 @@
              XLSX.writeFile(wb, "ClassReport.xlsx");
         };
 
-        // --- RECEIPT SYSTEM ---
+        // --- RECEIPT SYSTEM (modified delete) ---
         window.updateReceiptStudents = async () => {
             const cls = document.getElementById('receipt-class').value;
             const sel = document.getElementById('receipt-student');
@@ -1301,6 +1574,7 @@
             const pur = document.getElementById('receipt-purpose').value;
             const date = document.getElementById('receipt-date').value;
             const cls = document.getElementById('receipt-class').value;
+            const session = document.getElementById('receipt-session').value;
             const rNo = 'NB-' + Math.floor(1000 + Math.random() * 9000);
 
             const data = {
@@ -1310,6 +1584,7 @@
                 amount: amt,
                 purpose: pur,
                 date: date,
+                session: session,
                 timestamp: new Date()
             };
 
@@ -1342,10 +1617,15 @@
             document.getElementById('dash-total-receipts').textContent = snap.size;
         };
         
-        window.deleteReceipt = async(id) => {
-            if(confirm('Delete this record?')) {
-                await deleteDoc(doc(db, 'receipts', id));
-                loadReceiptHistory();
+        window.deleteReceipt = async (id) => {
+            if(confirm('Move receipt to recycle bin?')) {
+                const docRef = doc(db, 'receipts', id);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    await moveToRecycleBin('receipts', id, docSnap.data());
+                    await deleteDoc(docRef);
+                    loadReceiptHistory();
+                }
             }
         };
 
@@ -1392,6 +1672,10 @@
                             <span class="text-gray-500">Amount:</span>
                             <span class="font-bold text-xl text-emerald-800">₦${r.amount}</span>
                         </div>
+                        <div class="flex justify-between border-b border-dotted py-1">
+                            <span class="text-gray-500">Session:</span>
+                            <span class="font-bold">${r.session}</span>
+                        </div>
                     </div>
 
                     <div class="flex justify-between items-end">
@@ -1419,16 +1703,17 @@
             }, 300);
         }
 
-        // --- TIMETABLE (REWRITTEN: DYNAMIC & EDITABLE) ---
-        // Defaults if no data exists
+        // --- TIMETABLE (unchanged) ---
         const defaultHeaders = ['8:00-8:40', '8:40-9:20', '9:20-10:00', 'Break', '10:30-11:10', '11:10-11:50', '11:50-12:30'];
         const defaultRows = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
         window.loadTimetable = async () => {
             const cls = document.getElementById('timetable-class').value;
+            const session = document.getElementById('timetable-session').value;
+            const term = document.getElementById('timetable-term').value;
             const wrapper = document.getElementById('timetable-print-wrapper');
             
-            const q = query(collection(db, 'timetable'), where('class', '==', cls));
+            const q = query(collection(db, 'timetable'), where('class', '==', cls), where('session', '==', session), where('term', '==', term));
             const snap = await getDocs(q);
             
             let tData = { 
@@ -1443,11 +1728,9 @@
                 const raw = snap.docs[0].data();
                 try {
                     const parsed = JSON.parse(raw.json);
-                    // Check if it's the new format (has 'headers') or old format
                     if(parsed.headers) {
                         tData = parsed;
                     } else {
-                        // Legacy support: use default headers/rows but keep values
                         tData.values = parsed;
                     }
                 } catch(e) { console.error("Error parsing timetable", e); }
@@ -1478,7 +1761,6 @@
                                 <th class="p-3 border border-white/20">Day/Time</th>
             `;
 
-            // Render Editable Headers
             tData.headers.forEach((h, idx) => {
                 html += `<th class="p-3 border border-white/20 min-w-[80px]">
                             <input type="text" value="${h}" class="editable-header tt-header-input" data-idx="${idx}">
@@ -1486,7 +1768,6 @@
             });
             html += `</tr></thead><tbody>`;
 
-            // Render Rows
             tData.rows.forEach((rowLabel, rIdx) => {
                 const bgRow = rIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50';
                 html += `<tr class="${bgRow}">
@@ -1495,8 +1776,7 @@
                             </td>`;
                 
                 tData.headers.forEach((h, cIdx) => {
-                    const key = `${rIdx}-${cIdx}`; // New Key format based on indices
-                    // Legacy key fallback check (Day-Index) - simpler to just reset for dynamic grid
+                    const key = `${rIdx}-${cIdx}`;
                     const val = tData.values[key] || '';
                     
                     html += `<td class="border border-emerald-200 p-0 tt-cell">
@@ -1507,12 +1787,11 @@
             });
             
             html += `</tbody></table>
-                <div class="mt-4 text-center text-xs text-gray-500 font-bold uppercase">Effective from: 2025/2026 Session</div>
+                <div class="mt-4 text-center text-xs text-gray-500 font-bold uppercase">Effective from: ${document.getElementById('timetable-session').value} ${document.getElementById('timetable-term').value}</div>
             </div>`;
             wrapper.innerHTML = html;
         }
 
-        // Dynamic Timetable Functions
         window.addTimetableColumn = () => {
             const data = scrapeTimetableData();
             data.headers.push("New Period");
@@ -1553,36 +1832,41 @@
 
         window.saveTimetable = async () => {
             const cls = document.getElementById('timetable-class').value;
+            const session = document.getElementById('timetable-session').value;
+            const term = document.getElementById('timetable-term').value;
             const data = scrapeTimetableData();
             
             const wrapper = document.getElementById('timetable-print-wrapper');
             const docId = wrapper.dataset.docId;
 
+            const payload = {
+                class: cls,
+                session: session,
+                term: term,
+                json: JSON.stringify(data)
+            };
+
             if(docId) {
-                await updateDoc(doc(db, 'timetable', docId), { json: JSON.stringify(data) });
+                await updateDoc(doc(db, 'timetable', docId), payload);
             } else {
-                await addDoc(collection(db, 'timetable'), { class: cls, json: JSON.stringify(data) });
+                await addDoc(collection(db, 'timetable'), payload);
             }
             showToast('Timetable Saved');
         };
 
         window.printTimetable = () => {
-            // Temporarily replace inputs with text for printing
             const container = document.getElementById('timetable-print-wrapper').cloneNode(true);
             
-            // Replace header inputs
             container.querySelectorAll('.tt-header-input').forEach(inp => {
                 const span = document.createElement('span');
                 span.textContent = inp.value;
                 inp.replaceWith(span);
             });
-            // Replace row inputs
             container.querySelectorAll('.tt-row-input').forEach(inp => {
                 const span = document.createElement('span');
                 span.textContent = inp.value;
                 inp.replaceWith(span);
             });
-            // Replace cell inputs
             container.querySelectorAll('.tt-input').forEach(inp => {
                 const div = document.createElement('div');
                 div.className = "p-2 font-bold text-gray-800 text-center";
@@ -1604,12 +1888,129 @@
             }, 1000);
         };
 
+        // --- SETTINGS: Class & Session Management (modified delete) ---
+        window.loadSettingsData = async () => {
+            await loadClasses();
+            await loadSessionsAndTerms();
+
+            const classList = document.getElementById('class-list');
+            classList.innerHTML = '';
+            CLASSES.forEach(cls => {
+                classList.insertAdjacentHTML('beforeend', `
+                    <li class="flex justify-between items-center p-2 bg-gray-50 rounded border">
+                        <span>${cls}</span>
+                        <button onclick="deleteClass('${cls}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                    </li>
+                `);
+            });
+
+            const sessionsDiv = document.getElementById('sessions-list');
+            sessionsDiv.innerHTML = '';
+            for (let s of SESSIONS) {
+                const terms = s.terms || ['1st Term', '2nd Term', '3rd Term'];
+                const sessionDiv = document.createElement('div');
+                sessionDiv.className = 'border p-3 rounded bg-gray-50';
+                sessionDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-emerald-700">${s.name}</span>
+                        <button onclick="deleteSession('${s.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        ${terms.map(t => `<span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-sm">${t}</span>`).join('')}
+                    </div>
+                    <div class="mt-2 flex gap-2">
+                        <input type="text" id="new-term-${s.id}" placeholder="New term" class="border p-1 text-sm rounded flex-1">
+                        <button onclick="addTermToSession('${s.id}')" class="bg-emerald-600 text-white px-2 py-1 text-sm rounded">Add Term</button>
+                    </div>
+                `;
+                sessionsDiv.appendChild(sessionDiv);
+            }
+        };
+
+        document.getElementById('add-class-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newClass = document.getElementById('new-class-name').value.trim();
+            if (!newClass) return;
+            await addDoc(collection(db, 'classes'), { name: newClass });
+            showToast('Class added');
+            document.getElementById('new-class-name').value = '';
+            await loadClasses();
+            populateClassDropdowns();
+            loadSettingsData();
+        });
+
+        window.deleteClass = async (className) => {
+            if (!confirm(`Move class "${className}" to recycle bin?`)) return;
+            const q = query(collection(db, 'classes'), where('name', '==', className));
+            const snap = await getDocs(q);
+            snap.forEach(async d => {
+                await moveToRecycleBin('classes', d.id, d.data());
+                await deleteDoc(d.ref);
+            });
+            showToast('Class moved to recycle bin');
+            await loadClasses();
+            populateClassDropdowns();
+            loadSettingsData();
+        };
+
+        document.getElementById('add-session-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newSession = document.getElementById('new-session-name').value.trim();
+            if (!newSession) return;
+            await addDoc(collection(db, 'sessions'), { name: newSession, terms: ['1st Term', '2nd Term', '3rd Term'] });
+            showToast('Session added');
+            document.getElementById('new-session-name').value = '';
+            await loadSessionsAndTerms();
+            populateSessionTermDropdowns();
+            loadSettingsData();
+        });
+
+        window.deleteSession = async (sessionId) => {
+            if (!confirm('Move this session to recycle bin? Marks and receipts will remain but may not be accessible.')) return;
+            const docRef = doc(db, 'sessions', sessionId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                await moveToRecycleBin('sessions', sessionId, docSnap.data());
+                await deleteDoc(docRef);
+                await loadSessionsAndTerms();
+                populateSessionTermDropdowns();
+                loadSettingsData();
+            }
+        };
+
+        window.addTermToSession = async (sessionId) => {
+            const input = document.getElementById(`new-term-${sessionId}`);
+            const newTerm = input.value.trim();
+            if (!newTerm) return;
+            const sessionRef = doc(db, 'sessions', sessionId);
+            const sessionSnap = await getDoc(sessionRef);
+            const sessionData = sessionSnap.data();
+            const terms = sessionData.terms || [];
+            if (!terms.includes(newTerm)) {
+                terms.push(newTerm);
+                await updateDoc(sessionRef, { terms });
+                showToast('Term added');
+                await loadSessionsAndTerms();
+                populateSessionTermDropdowns();
+                loadSettingsData();
+            } else {
+                showToast('Term already exists', 'error');
+            }
+        };
+
         // --- DASHBOARD STATS ---
         window.loadDashboardStats = async () => {
             const sSnap = await getDocs(collection(db, 'students'));
             document.getElementById('dash-total-students').textContent = sSnap.size;
+            document.getElementById('dash-total-classes').textContent = CLASSES.length;
+            const rSnap = await getDocs(collection(db, 'receipts'));
+            document.getElementById('dash-total-receipts').textContent = rSnap.size;
         };
 
+        window.validateReceipt = () => {
+            const no = document.getElementById('validate-receipt-no').value;
+            showToast(`Receipt ${no} is valid (demo)`, 'success');
+        };
     </script>
 </body>
 </html>
