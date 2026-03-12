@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Nurul Bayan Science Academy - Management System</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -146,6 +146,19 @@
             pointer-events: auto;
         }
 
+        /* Watermark logo style */
+        .watermark-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.1;
+            width: 300px;
+            height: auto;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         /* PRINT STYLES - REVISED FOR BULK */
         @media print {
             @page {
@@ -207,6 +220,38 @@
             .tt-action-btn {
                 display: none !important;
             }
+
+            /* Ensure watermark prints */
+            .watermark-logo {
+                opacity: 0.1 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 640px) {
+            .sidebar-mobile {
+                position: fixed;
+                z-index: 50;
+                width: 80%;
+                max-width: 300px;
+                height: 100vh;
+                left: 0;
+                top: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar-mobile.open {
+                transform: translateX(0);
+            }
+            .modal .max-w-md {
+                width: 95%;
+                margin: 0 auto;
+            }
+            .overflow-x-auto {
+                -webkit-overflow-scrolling: touch;
+            }
         }
     </style>
 </head>
@@ -214,11 +259,12 @@
 
     <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2"></div>
 
+    <!-- LOGIN SCREEN with logo -->
     <div id="login-screen" class="fixed inset-0 z-50 bg-emerald-900 flex items-center justify-center">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md transform transition-all hover:scale-105 duration-300 mx-4">
             <div class="text-center mb-6">
-                <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-800 text-3xl">
-                    <i class="fas fa-graduation-cap"></i>
+                <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 p-2">
+                    <img src="https://i.ibb.co/8n7XL28J/file-00000000c280724687c077dba608d0bf-1-removebg-preview.png" alt="Logo" class="w-full h-full object-contain">
                 </div>
                 <h1 class="text-2xl font-bold text-emerald-800">Nurul Bayan Academy</h1>
                 <p class="text-sm text-gray-500 mt-1">Admin Portal</p>
@@ -241,9 +287,10 @@
 
     <div id="app-container" class="hidden flex h-screen overflow-hidden">
         
+        <!-- SIDEBAR with logo -->
         <aside id="sidebar" class="bg-emerald-900 text-white w-64 flex-shrink-0 hidden md:flex flex-col transition-all duration-300">
             <div class="p-6 border-b border-emerald-800 flex flex-col items-center">
-                <i class="fas fa-school text-4xl text-amber-400 mb-2"></i>
+                <img src="https://i.ibb.co/8n7XL28J/file-00000000c280724687c077dba608d0bf-1-removebg-preview.png" alt="Logo" class="h-16 w-auto mb-2">
                 <h2 class="font-bold text-center leading-tight">NURUL BAYAN<br><span class="text-xs text-emerald-300 font-normal">Science Academy</span></h2>
             </div>
             <nav class="flex-1 overflow-y-auto py-4">
@@ -267,7 +314,7 @@
         <main class="flex-1 flex flex-col overflow-hidden bg-gray-50">
             <header class="bg-white shadow-sm z-20 flex items-center justify-between px-6 py-3 no-print">
                 <button id="menu-toggle" class="md:hidden text-emerald-800 text-2xl"><i class="fas fa-bars"></i></button>
-                <div class="font-semibold text-gray-700">
+                <div class="font-semibold text-gray-700 text-sm sm:text-base">
                     Session: <span id="current-session-display" class="text-emerald-700"></span> | Term: <span id="current-term-display" class="text-amber-600"></span>
                 </div>
                 <div class="flex items-center gap-4">
@@ -275,8 +322,8 @@
                         <p class="text-sm font-bold text-gray-800">Administrator</p>
                         <p class="text-xs text-gray-500">Nurul Bayan Academy</p>
                     </div>
-                    <div class="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700">
-                        <i class="fas fa-user"></i>
+                    <div class="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 overflow-hidden">
+                        <img src="https://i.ibb.co/8n7XL28J/file-00000000c280724687c077dba608d0bf-1-removebg-preview.png" alt="Logo" class="h-8 w-8 object-contain">
                     </div>
                 </div>
             </header>
@@ -689,7 +736,7 @@
     <div id="global-print-container" class="hidden"></div>
 
     <!-- Add Student Modal -->
-    <div id="add-student-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div id="add-student-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 m-4">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Add New Student</h3>
             <form id="create-student-form" class="space-y-4">
@@ -715,11 +762,11 @@
     </div>
 
     <!-- Promote Students Modal -->
-    <div id="promote-students-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div id="promote-students-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 m-4">
             <h3 class="text-xl font-bold text-gray-800 mb-4">Promote Students</h3>
             <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700">From Class</label>
                         <select id="promote-from-class" class="w-full border p-2 rounded mt-1" onchange="loadPromoteStudents()"></select>
@@ -774,6 +821,8 @@
         let activeTerm = '';
         
         let currentUser = sessionStorage.getItem('user');
+
+        const LOGO_URL = "https://i.ibb.co/8n7XL28J/file-00000000c280724687c077dba608d0bf-1-removebg-preview.png";
         
         // --- AUTHENTICATION ---
         window.login = function(e) {
@@ -826,7 +875,6 @@
             if(viewId === 'settings') loadSettingsData();
             if(viewId === 'recyclebin') loadRecycleBin();
             if(viewId === 'students') {
-                // Refresh student list and class dropdowns for promotion modal
                 loadStudents();
                 populatePromoteClassDropdowns();
             }
@@ -847,7 +895,6 @@
             loadDashboardStats();
             loadStudents();
             loadSubjectsList();
-            // Update header display
             updateHeaderSessionTerm();
         }
 
@@ -887,7 +934,6 @@
                     activeSession = data.activeSession || (SESSIONS.length > 0 ? SESSIONS[0].name : '');
                     activeTerm = data.activeTerm || (SESSIONS.length > 0 && SESSIONS[0].terms ? SESSIONS[0].terms[0] : '');
                 } else {
-                    // Set defaults if no settings exist
                     if (SESSIONS.length > 0) {
                         activeSession = SESSIONS[0].name;
                         activeTerm = SESSIONS[0].terms ? SESSIONS[0].terms[0] : '';
@@ -950,7 +996,6 @@
             const sessionSelects = [marksSession, reportSession, receiptSession, ttSession, globalSession];
             const termSelects = [marksTerm, reportTerm, ttTerm, globalTerm];
 
-            // Clear and populate sessions
             sessionSelects.forEach(sel => {
                 if (sel) {
                     sel.innerHTML = '';
@@ -963,7 +1008,6 @@
                 }
             });
 
-            // Set active session/term if available
             if (activeSession) {
                 sessionSelects.forEach(sel => { if (sel) sel.value = activeSession; });
                 updateTermDropdownsForGlobal(activeSession);
@@ -975,7 +1019,6 @@
                 updateTermDropdownsForGlobal(SESSIONS[0].name);
             }
 
-            // Add event listeners for dependent term dropdowns
             marksSession?.addEventListener('change', () => updateTermDropdowns(marksSession.value, 'marks-term'));
             reportSession?.addEventListener('change', () => updateTermDropdowns(reportSession.value, 'report-term'));
             ttSession?.addEventListener('change', () => updateTermDropdowns(ttSession.value, 'timetable-term'));
@@ -1020,7 +1063,6 @@
             const term = document.getElementById('global-term').value;
             if (session && term) {
                 saveActiveSettings(session, term);
-                // Update all dropdowns to match new active
                 populateSessionTermDropdowns();
             } else {
                 showToast('Please select both session and term', 'error');
@@ -1081,9 +1123,7 @@
                 const recycleDoc = await getDoc(doc(db, 'recycle_bin', recycleId));
                 if (!recycleDoc.exists()) return;
                 const { originalCollection, originalId, data } = recycleDoc.data();
-                // Restore to original collection with original ID
                 await setDoc(doc(db, originalCollection, originalId), data);
-                // Delete from recycle bin
                 await deleteDoc(doc(db, 'recycle_bin', recycleId));
                 showToast('Item restored successfully');
                 loadRecycleBin();
@@ -1283,7 +1323,7 @@
                 await Promise.all(promises);
                 showToast('Students promoted successfully');
                 closeModal('promote-students-modal');
-                loadStudents(); // Refresh student list
+                loadStudents();
             } catch (error) {
                 console.error('Error promoting students:', error);
                 showToast('Promotion failed', 'error');
@@ -1467,7 +1507,7 @@
              }
         };
 
-        // --- REPORT CARDS (improved QR for print) ---
+        // --- REPORT CARDS (modified with logo) ---
         let currentClassReportData = [];
 
         window.generateReportList = async () => {
@@ -1556,7 +1596,7 @@
             });
         }
 
-        // --- BULK PRINTING (fixed) ---
+        // --- BULK PRINTING with logo integration ---
         window.printAllReports = async () => {
              if(currentClassReportData.length === 0) return showToast('Generate list first', 'error');
              
@@ -1637,13 +1677,12 @@
                 <div class="h-full w-full border-4 border-emerald-800 p-1 bg-white relative text-gray-800 flex flex-col">
                     <div class="h-full border-2 border-amber-500 p-4 relative flex flex-col flex-grow">
                         
-                        <div class="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
-                            <i class="fas fa-book-quran text-[400px]"></i>
-                        </div>
+                        <!-- Watermark Logo -->
+                        <img src="${LOGO_URL}" class="watermark-logo" alt="watermark">
 
                         <div class="flex justify-between items-center border-b-2 border-emerald-800 pb-2 mb-2 flex-shrink-0">
                             <div class="w-24 text-center">
-                                <div class="text-4xl text-emerald-800"><i class="fas fa-book-open"></i></div>
+                                <img src="${LOGO_URL}" class="h-16 w-auto mx-auto" alt="Logo">
                             </div>
                             <div class="text-center flex-1">
                                 <h2 class="text-2xl arabic-text text-emerald-700 font-bold mb-1">نور البيان الأكاديمية للعلوم</h2>
@@ -1764,7 +1803,7 @@
              XLSX.writeFile(wb, "ClassReport.xlsx");
         };
 
-        // --- RECEIPT SYSTEM (modified delete) ---
+        // --- RECEIPT SYSTEM (modified delete and logo) ---
         window.updateReceiptStudents = async () => {
             const cls = document.getElementById('receipt-class').value;
             const sel = document.getElementById('receipt-student');
@@ -1849,8 +1888,11 @@
             const area = document.getElementById('global-print-container');
             area.innerHTML = `
                  <div class="border-2 border-dashed border-gray-400 p-6 max-w-xl mx-auto relative bg-white mt-8">
-                    <div class="flex items-center gap-4 mb-4 border-b pb-4">
-                         <div class="text-4xl text-emerald-800"><i class="fas fa-university"></i></div>
+                    <!-- Watermark Logo -->
+                    <img src="${LOGO_URL}" class="watermark-logo" style="width:200px;" alt="watermark">
+                    
+                    <div class="flex items-center gap-4 mb-4 border-b pb-4 relative z-10">
+                         <img src="${LOGO_URL}" class="h-12 w-auto" alt="Logo">
                          <div>
                             <h2 class="font-bold text-xl text-emerald-800">NURUL BAYAN SCIENCE ACADEMY</h2>
                             <p class="text-xs text-gray-600">No. 2222 Janbulo Housing Estate, Kano</p>
@@ -1858,7 +1900,7 @@
                          </div>
                     </div>
                     
-                    <div class="flex justify-between items-center mb-6">
+                    <div class="flex justify-between items-center mb-6 relative z-10">
                         <div class="bg-gray-100 px-3 py-1 rounded">
                             <span class="text-xs text-gray-500 uppercase">Receipt No</span>
                             <div class="font-mono font-bold text-lg">${r.receiptNo}</div>
@@ -1869,7 +1911,7 @@
                         </div>
                     </div>
 
-                    <div class="space-y-3 text-sm mb-8">
+                    <div class="space-y-3 text-sm mb-8 relative z-10">
                         <div class="flex justify-between border-b border-dotted py-1">
                             <span class="text-gray-500">Received From:</span>
                             <span class="font-bold uppercase">${r.student}</span>
@@ -1892,7 +1934,7 @@
                         </div>
                     </div>
 
-                    <div class="flex justify-between items-end">
+                    <div class="flex justify-between items-end relative z-10">
                         <div class="text-[10px] text-gray-400">
                              Generated by Admin<br>
                              ${new Date().toLocaleString()}
@@ -1902,7 +1944,7 @@
                         </div>
                     </div>
                     
-                    <div class="mt-4 text-center text-[10px] text-gray-500 pt-2 border-t">
+                    <div class="mt-4 text-center text-[10px] text-gray-500 pt-2 border-t relative z-10">
                         Dev: Abu-Abdurrahman CodeVerge | +2348107907647
                     </div>
                 </div>
@@ -1917,7 +1959,7 @@
             }, 300);
         }
 
-        // --- TIMETABLE (unchanged) ---
+        // --- TIMETABLE (modified with logo) ---
         const defaultHeaders = ['8:00-8:40', '8:40-9:20', '9:20-10:00', 'Break', '10:30-11:10', '11:10-11:50', '11:50-12:30'];
         const defaultRows = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
@@ -1958,15 +2000,18 @@
             const wrapper = document.getElementById('timetable-print-wrapper');
             
             let html = `
-                <div class="print-container">
+                <div class="print-container relative">
+                    <!-- Watermark Logo -->
+                    <img src="${LOGO_URL}" class="watermark-logo" style="width:300px;" alt="watermark">
+                    
                     <div class="text-center mb-6">
                          <div class="flex justify-between items-center border-b-2 border-emerald-800 pb-2 mb-2">
-                             <div class="text-4xl text-emerald-800"><i class="fas fa-book-open"></i></div>
+                             <div class="w-16 h-16"><img src="${LOGO_URL}" class="h-full w-auto" alt="Logo"></div>
                              <div class="text-center">
                                 <h1 class="text-2xl font-bold uppercase text-emerald-800">Nurul Bayan Science Academy</h1>
                                 <div class="bg-amber-500 text-white px-4 py-1 inline-block rounded-full font-bold mt-1 shadow-sm">CLASS TIMETABLE: ${document.getElementById('timetable-class').value}</div>
                              </div>
-                             <div class="text-4xl text-emerald-800"><i class="fas fa-graduation-cap"></i></div>
+                             <div class="w-16 h-16"><img src="${LOGO_URL}" class="h-full w-auto" alt="Logo"></div>
                          </div>
                     </div>
                     <table class="w-full border-2 border-emerald-800 text-sm text-center shadow-lg rounded-lg overflow-hidden" id="timetable-table">
