@@ -9,7 +9,7 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
@@ -198,6 +198,30 @@
                 page-break-after: auto;
             }
 
+            /* Honor Roll Landscape */
+            .honor-roll-landscape {
+                page-break-after: always;
+                page-break-inside: avoid;
+                width: 297mm;
+                min-height: 210mm;
+                padding: 10mm;
+                box-sizing: border-box;
+                position: relative;
+                overflow: hidden;
+            }
+
+            /* Certificate Landscape */
+            .certificate-landscape {
+                page-break-after: always;
+                page-break-inside: avoid;
+                width: 297mm;
+                min-height: 210mm;
+                padding: 5mm;
+                box-sizing: border-box;
+                position: relative;
+                overflow: hidden;
+            }
+
             /* Force background colors */
             .bg-emerald-800 { background-color: #065F46 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .bg-emerald-100 { background-color: #D1FAE5 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -253,6 +277,16 @@
                 -webkit-overflow-scrolling: touch;
             }
         }
+
+        /* Certificate specific */
+        .certificate-border {
+            border: 12px double var(--primary);
+            border-radius: 20px;
+            background: white;
+        }
+        .fancy-text {
+            font-family: 'Great Vibes', cursive;
+        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -300,6 +334,8 @@
                     <li><button onclick="nav('subjects')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-book w-5"></i> Subjects</button></li>
                     <li><button onclick="nav('marks')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-edit w-5"></i> Manage Marks</button></li>
                     <li><button onclick="nav('reports')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-print w-5"></i> Report Cards</button></li>
+                    <!-- NEW: Honor Roll -->
+                    <li><button onclick="nav('honorroll')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-trophy w-5"></i> Honor Roll</button></li>
                     <li><button onclick="nav('finance')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-receipt w-5"></i> Receipts</button></li>
                     <li><button onclick="nav('timetable')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-calendar-alt w-5"></i> Timetable</button></li>
                     <li><button onclick="nav('recyclebin')" class="nav-btn w-full text-left px-6 py-3 hover:bg-emerald-800 flex items-center gap-3 border-l-4 border-transparent"><i class="fas fa-trash-restore w-5"></i> Recycle Bin</button></li>
@@ -541,6 +577,31 @@
                                 <tbody id="report-list-tbody"></tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- NEW: Honor Roll View -->
+                <div id="view-honorroll" class="view-section hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">🏆 Honor Roll - Top Students Per Class</h2>
+                    
+                    <!-- Session & Term Selectors -->
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Session</label>
+                            <select id="honor-session" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-600">Term</label>
+                            <select id="honor-term" class="w-full border p-2 rounded mt-1"></select>
+                        </div>
+                        <div class="flex items-end gap-2">
+                            <button onclick="loadHonorRoll()" class="bg-emerald-600 text-white px-6 py-2 rounded hover:bg-emerald-700">Load Honor Roll</button>
+                            <button onclick="printHonorRoll()" class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700"><i class="fas fa-print"></i> Print List</button>
+                        </div>
+                    </div>
+
+                    <div id="honor-roll-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Cards will be injected dynamically -->
                     </div>
                 </div>
 
@@ -992,9 +1053,12 @@
             const ttTerm = document.getElementById('timetable-term');
             const globalSession = document.getElementById('global-session');
             const globalTerm = document.getElementById('global-term');
+            // NEW honor roll selects
+            const honorSession = document.getElementById('honor-session');
+            const honorTerm = document.getElementById('honor-term');
 
-            const sessionSelects = [marksSession, reportSession, receiptSession, ttSession, globalSession];
-            const termSelects = [marksTerm, reportTerm, ttTerm, globalTerm];
+            const sessionSelects = [marksSession, reportSession, receiptSession, ttSession, globalSession, honorSession];
+            const termSelects = [marksTerm, reportTerm, ttTerm, globalTerm, honorTerm];
 
             sessionSelects.forEach(sel => {
                 if (sel) {
@@ -1023,6 +1087,7 @@
             reportSession?.addEventListener('change', () => updateTermDropdowns(reportSession.value, 'report-term'));
             ttSession?.addEventListener('change', () => updateTermDropdowns(ttSession.value, 'timetable-term'));
             globalSession?.addEventListener('change', () => updateTermDropdowns(globalSession.value, 'global-term'));
+            if (honorSession) honorSession.addEventListener('change', () => updateTermDropdowns(honorSession.value, 'honor-term'));
         }
 
         function updateTermDropdowns(sessionName, termSelectId) {
@@ -1040,7 +1105,7 @@
         }
 
         function updateTermDropdownsForGlobal(sessionName) {
-            const termSelectIds = ['marks-term', 'report-term', 'timetable-term', 'global-term'];
+            const termSelectIds = ['marks-term', 'report-term', 'timetable-term', 'global-term', 'honor-term'];
             const session = SESSIONS.find(s => s.name === sessionName);
             const terms = session ? session.terms : ['1st Term', '2nd Term', '3rd Term'];
             termSelectIds.forEach(id => {
@@ -1581,7 +1646,7 @@
         }
 
         // Helper: generate QR code data URL
-        function generateQRDataURL(text) {
+        async function generateQRDataURL(text) {
             return new Promise((resolve) => {
                 const qrDiv = document.createElement('div');
                 new QRCode(qrDiv, { text, width: 80, height: 80 });
@@ -2270,6 +2335,246 @@
             const no = document.getElementById('validate-receipt-no').value;
             showToast(`Receipt ${no} is valid (demo)`, 'success');
         };
+
+        // ========== NEW HONOR ROLL FUNCTIONS ==========
+        window.loadHonorRoll = async () => {
+            const session = document.getElementById('honor-session').value;
+            const term = document.getElementById('honor-term').value;
+            if (!session || !term) return showToast('Select session and term', 'error');
+
+            const container = document.getElementById('honor-roll-container');
+            container.innerHTML = '<div class="col-span-3 text-center p-8"><div class="loader mx-auto"></div></div>';
+
+            // Get all students grouped by class
+            const studentsSnap = await getDocs(collection(db, 'students'));
+            const studentsByClass = {};
+            studentsSnap.forEach(docSnap => {
+                const s = docSnap.data();
+                if (!studentsByClass[s.class]) studentsByClass[s.class] = [];
+                studentsByClass[s.class].push({ id: docSnap.id, ...s });
+            });
+
+            // For each class, get marks and compute averages
+            const honorData = [];
+            for (const [className, students] of Object.entries(studentsByClass)) {
+                const marksQuery = query(collection(db, 'marks'), where('class', '==', className), where('session', '==', session), where('term', '==', term));
+                const marksSnap = await getDocs(marksQuery);
+                const marksMap = {};
+                marksSnap.forEach(m => {
+                    const data = m.data();
+                    if (!marksMap[data.studentId]) marksMap[data.studentId] = [];
+                    marksMap[data.studentId].push(data.total);
+                });
+
+                const studentAverages = students.map(student => {
+                    const totals = marksMap[student.id] || [];
+                    const avg = totals.length ? (totals.reduce((a,b)=>a+b,0) / totals.length).toFixed(1) : 0;
+                    return { ...student, average: parseFloat(avg) };
+                }).filter(s => s.average > 0).sort((a,b) => b.average - a.average).slice(0, 3);
+
+                if (studentAverages.length) {
+                    honorData.push({ className, topStudents: studentAverages });
+                }
+            }
+
+            // Render cards
+            container.innerHTML = '';
+            if (honorData.length === 0) {
+                container.innerHTML = '<div class="col-span-3 text-center p-8 text-gray-500">No honor roll data for this session/term.</div>';
+                return;
+            }
+
+            honorData.forEach(clsData => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-lg overflow-hidden border-t-4 border-amber-500';
+                let studentRows = '';
+                clsData.topStudents.forEach((s, idx) => {
+                    const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉';
+                    studentRows += `
+                        <tr class="border-b border-gray-100">
+                            <td class="p-3">${medal} ${s.name}</td>
+                            <td class="p-3 font-bold text-emerald-700">${s.average}</td>
+                            <td class="p-3 text-center">
+                                <button onclick='printCertificate("${s.id}", "${s.name}", "${clsData.className}", ${s.average})' class="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full hover:bg-amber-200 transition"><i class="fas fa-certificate mr-1"></i> Cert</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                card.innerHTML = `
+                    <div class="bg-emerald-800 text-white px-4 py-3 flex justify-between items-center">
+                        <h3 class="font-bold text-lg">${clsData.className}</h3>
+                        <span class="bg-amber-400 text-emerald-900 text-xs px-2 py-1 rounded-full font-bold">Top 3</span>
+                    </div>
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 text-gray-600">
+                            <tr><th class="p-2 text-left">Student</th><th class="p-2">Avg</th><th class="p-2"></th></tr>
+                        </thead>
+                        <tbody>
+                            ${studentRows}
+                        </tbody>
+                    </table>
+                `;
+                container.appendChild(card);
+            });
+        };
+
+        // Print Honor Roll List (Landscape)
+        window.printHonorRoll = async () => {
+            const session = document.getElementById('honor-session').value;
+            const term = document.getElementById('honor-term').value;
+            if (!session || !term) return showToast('Select session and term', 'error');
+
+            // Re-fetch data for print (simplify: use existing container data)
+            const container = document.getElementById('honor-roll-container');
+            const cards = container.querySelectorAll('.bg-white.rounded-xl');
+            if (!cards.length) return showToast('Load honor roll first', 'error');
+
+            const printArea = document.getElementById('global-print-container');
+            printArea.innerHTML = '';
+            printArea.classList.remove('hidden');
+
+            // Build landscape HTML
+            let html = `
+                <div class="honor-roll-landscape relative p-8 bg-white" style="width:297mm; min-height:210mm;">
+                    <!-- Watermark -->
+                    <img src="${LOGO_URL}" class="watermark-logo" style="width:400px;" alt="watermark">
+                    
+                    <div class="flex justify-between items-center border-b-4 border-emerald-800 pb-4 mb-6">
+                        <img src="${LOGO_URL}" class="h-20 w-auto" alt="Logo">
+                        <div class="text-center">
+                            <h1 class="text-4xl font-bold text-emerald-800">NURUL BAYAN SCIENCE ACADEMY</h1>
+                            <p class="text-xl text-amber-600">Honor Roll - Top Students</p>
+                            <p class="text-sm">${session} | ${term}</p>
+                        </div>
+                        <div class="w-20 h-20">
+                            <img class="qr-code-img w-full h-full" id="honor-qr" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 mt-4">
+            `;
+
+            cards.forEach(card => {
+                const className = card.querySelector('h3')?.innerText || '';
+                const rows = card.querySelectorAll('tbody tr');
+                let tableRows = '';
+                rows.forEach((row, i) => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 2) {
+                        const name = cells[0].innerText.replace(/[🥇🥈🥉]/g,'').trim();
+                        const avg = cells[1].innerText;
+                        tableRows += `<tr><td class="p-2 border">${name}</td><td class="p-2 border text-center font-bold">${avg}</td></tr>`;
+                    }
+                });
+                html += `
+                    <div class="border-2 border-emerald-700 rounded-lg p-4">
+                        <h3 class="text-2xl font-bold text-emerald-800 border-b border-amber-400 pb-1 mb-2">${className}</h3>
+                        <table class="w-full text-sm">
+                            <thead><tr class="bg-emerald-100"><th class="p-2 border">Student</th><th class="p-2 border w-24">Average</th></tr></thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                `;
+            });
+
+            html += `</div><div class="text-center mt-6 text-xs text-gray-400">Generated on ${new Date().toLocaleDateString()}</div></div>`;
+            printArea.innerHTML = html;
+
+            // Generate QR for verification (maybe encode session/term)
+            const qrData = `https://nurul-bayan-academy.web.app/verify?honor=${session}-${term}`;
+            const qrUrl = await generateQRDataURL(qrData);
+            document.getElementById('honor-qr')?.setAttribute('src', qrUrl);
+
+            window.print();
+            setTimeout(() => {
+                printArea.classList.add('hidden');
+                printArea.innerHTML = '';
+            }, 1000);
+        };
+
+        // Print Certificate for a student
+        window.printCertificate = async (studentId, studentName, className, average) => {
+            const session = document.getElementById('honor-session')?.value || activeSession;
+            const term = document.getElementById('honor-term')?.value || activeTerm;
+            
+            const printArea = document.getElementById('global-print-container');
+            printArea.innerHTML = '';
+            printArea.classList.remove('hidden');
+
+            // Generate QR with verification link
+            const verifyUrl = `https://nurul-bayan-academy.web.app/verify?cert=${studentId}`;
+            const qrDataUrl = await generateQRDataURL(verifyUrl);
+
+            // --- PRINCIPAL SIGNATURE URL (REPLACE WITH YOUR ACTUAL SIGNATURE URL) ---
+            const signatureUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLIPCFIyMN0M-NK66wWmy4KbCVnzs_1Kz9Dg&s"; // <-- REPLACE THIS
+
+            const certificateHTML = `
+                <div class="certificate-landscape relative flex items-center justify-center p-4 bg-white" style="width:297mm; min-height:210mm;">
+                    <img src="${LOGO_URL}" class="watermark-logo" style="width:500px;" alt="watermark">
+                    
+                    <div class="certificate-border w-full h-full flex flex-col items-center justify-center p-12 relative" style="border: 12px double #047857; border-radius: 40px;">
+                        
+                        <!-- Top Logo & Title -->
+                        <div class="flex items-center gap-8 mb-8">
+                            <img src="${LOGO_URL}" class="h-24 w-auto" alt="Logo">
+                            <div class="text-center">
+                                <h1 class="text-5xl font-bold text-emerald-800">NURUL BAYAN</h1>
+                                <p class="text-2xl text-amber-600 -mt-1">Science Academy</p>
+                            </div>
+                            <img src="${LOGO_URL}" class="h-24 w-auto" alt="Logo">
+                        </div>
+
+                        <!-- Certificate of Appreciation -->
+                        <div class="text-center mt-6">
+                            <div class="fancy-text text-7xl text-emerald-700 mb-2">Certificate</div>
+                            <div class="fancy-text text-4xl text-amber-600 mb-6">of Appreciation</div>
+                            <div class="border-t-2 border-b-2 border-emerald-200 py-2 px-12 inline-block mb-8">
+                                <span class="text-xl uppercase tracking-widest text-gray-600">presented to</span>
+                            </div>
+                            <div class="fancy-text text-6xl text-emerald-800 mb-4">${studentName}</div>
+                            
+                            <p class="text-xl text-gray-600 mb-6">for outstanding academic performance</p>
+                            <p class="text-2xl">Class: <span class="font-bold text-emerald-700">${className}</span> &nbsp; | &nbsp; Average: <span class="font-bold text-amber-600">${average}%</span></p>
+                            <p class="text-lg text-gray-500 mt-2">Session: ${session} | Term: ${term}</p>
+                        </div>
+
+                        <!-- Bottom: signature, stamp, QR -->
+                        <div class="flex justify-between items-end w-full mt-12">
+                            <div class="text-center">
+                                <!-- Signature Image -->
+                                <img src="${signatureUrl}" alt="Principal Signature" class="h-16 w-auto mb-1" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div class="border-b-2 border-black w-48 mb-1"></div>
+                                <p class="text-sm font-bold">Principal's Signature</p>
+                            </div>
+                            <div class="unique-stamp scale-75">
+                                <div class="unique-stamp-inner">
+                                    <span class="approved">APPROVED</span>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <img class="qr-code-img w-24 h-24" src="${qrDataUrl}" />
+                                <p class="text-xs mt-1">Scan to verify</p>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="text-center mt-8 text-xs text-gray-400 border-t pt-2 w-full">
+                            Nurul Bayan Science Academy - Knowledge is the Root of Success
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            printArea.innerHTML = certificateHTML;
+            window.print();
+            setTimeout(() => {
+                printArea.classList.add('hidden');
+                printArea.innerHTML = '';
+            }, 1000);
+        };
+
+        // Attach new functions to window
+        window.generateQRDataURL = generateQRDataURL;
     </script>
 </body>
 </html>
